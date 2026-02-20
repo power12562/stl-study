@@ -48,7 +48,7 @@ namespace mst
 
 			iter_type& operator=(iter_type rhs)
 			{
-				swap(*this, rhs);
+				this->_currentNode = rhs._currentNode;
 				return *this;
 			}
 
@@ -104,10 +104,6 @@ namespace mst
 				return static_cast<iter_node_type*>(_currentNode);
 			}
 
-			static void swap(iter_type& lhs, iter_type& rhs)
-			{
-				std::swap(lhs._currentNode, rhs._currentNode);
-			}
 		};
 		using iterator = iterator_template<false>;
 		using const_iterator = iterator_template<true>;
@@ -134,14 +130,14 @@ namespace mst
 		iterator insert(iterator pos, const element_type& value)
 		{
 			if (pos._currentNode == nullptr) throw std::runtime_error("Invalid iterator.");
-			else
-			{
-				node* newNode = new node(value);
-				dummy_node* rightNode = pos._currentNode;
-				dummy_node* leftNode = rightNode->_prev;
-				link_node(leftNode, newNode, rightNode);
-				++_size;
-			}
+
+			node* newNode = new node(value);
+			dummy_node* rightNode = pos._currentNode;
+			dummy_node* leftNode = rightNode->_prev;
+			link_node(leftNode, newNode, rightNode);
+			++_size;
+
+			return iterator(newNode);
 		}
 
 		iterator insert(iterator pos, element_type&& value)
@@ -157,7 +153,7 @@ namespace mst
 			return iterator(newNode);
 		}
 
-		void erase(iterator pos)
+		iterator erase(iterator pos)
 		{
 			if (pos._currentNode == nullptr) throw std::runtime_error("Invalid iterator.");
 			dummy_node* currentNode = pos._currentNode;
@@ -170,6 +166,8 @@ namespace mst
 			link_node(lNode, rNode);
 			SafeDelete(eraseNode);
 			--_size;
+
+			return iterator(rNode);
 		}
 
 		iterator begin()
@@ -266,12 +264,14 @@ namespace mst
 		template<typename VT>
 		void push_back(VT&& value)
 		{
-
+			iterator back = end();
+			insert(back, std::forward<VT>(value));
 		}
 
 		void pop_back()
 		{
-
+			iterator back = --end();
+			erase(back);
 		}
 
 	private:

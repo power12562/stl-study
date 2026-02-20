@@ -47,9 +47,9 @@ static void list_test()
     mst::list<int>::iterator fiveIter;
     for (int i = 1; i <= 10; i++)
     {
-        mlt.push_front(i);
+        mlt.push_back(i);
         if (i == 5) 
-            fiveIter = mlt.begin();
+            fiveIter = --mlt.end();
     }
     fiveIter = mlt.insert(fiveIter, 55);
 
@@ -65,7 +65,7 @@ static void list_test()
     for (int i = 1; i <= size; i++)
     {
         std::cout << mlt.size() << ", ";
-        mlt.pop_front();
+        mlt.pop_back();
     }
     std::cout << mlt.size();
 
