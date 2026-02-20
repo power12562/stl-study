@@ -48,7 +48,7 @@ namespace mst
 
 			iter_type& operator=(iter_type rhs)
 			{
-				this->_currentNode = rhs._currentNode;
+				_currentNode = rhs._currentNode;
 				return *this;
 			}
 
@@ -205,7 +205,7 @@ namespace mst
 			if (empty()) throw std::runtime_error("list is empty.");
 			else
 			{
-				const_iterator front = static_cast<const node*>(get_front_node());
+				const_iterator front = get_front_node();
 				return *front;
 			}
 		}
@@ -225,7 +225,7 @@ namespace mst
 			if (empty()) throw std::runtime_error("list is empty.");
 			else
 			{
-				const_iterator back = static_cast<const node*>(get_back_node());
+				const_iterator back = get_back_node();
 				return *back;
 			}	
 		}
@@ -270,6 +270,8 @@ namespace mst
 
 		void pop_back()
 		{
+			if (empty()) return;
+
 			iterator back = --end();
 			erase(back);
 		}
