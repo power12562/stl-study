@@ -33,6 +33,7 @@ namespace mst
 			friend class container_type;
 
 		public:
+			iterator_template() = default;
 			iterator_template(iter_node_dummy_type* nd) : _currentNode(nd) {}
 			iterator_template(const iter_type& rhs) = default;
 			~iterator_template() = default;
@@ -43,6 +44,12 @@ namespace mst
 			iter_element_type& get() const
 			{
 				return get_node()->_data;
+			}
+
+			iter_type& operator=(iter_type rhs)
+			{
+				swap(*this, rhs);
+				return *this;
 			}
 
 			iter_element_type& operator*() const noexcept
@@ -85,19 +92,9 @@ namespace mst
 				return temp;
 			}
 
-			bool operator==(const iterator& rhs) const noexcept
+			template <bool rhsConst> bool operator==(const iterator_template<rhsConst>& rhs) const
 			{
 				return _currentNode == rhs._currentNode;
-			}
-
-			bool operator==(const const_iterator& rhs) const noexcept
-			{
-				return _currentNode == rhs._currentNode;
-			}
-
-			bool operator==(std::nullptr_t nptr) const noexcept
-			{
-				return _currentNode == nptr;
 			}
 
 		private:
@@ -105,6 +102,11 @@ namespace mst
 			iter_node_type* get_node() const
 			{
 				return static_cast<iter_node_type*>(_currentNode);
+			}
+
+			static void swap(iter_type& lhs, iter_type& rhs)
+			{
+				std::swap(lhs._currentNode, rhs._currentNode);
 			}
 		};
 		using iterator = iterator_template<false>;
@@ -129,6 +131,47 @@ namespace mst
 			return _size == 0;
 		}
 
+		iterator insert(iterator pos, const element_type& value)
+		{
+			if (pos._currentNode == nullptr) throw std::runtime_error("Invalid iterator.");
+			else
+			{
+				node* newNode = new node(value);
+				dummy_node* rightNode = pos._currentNode;
+				dummy_node* leftNode = rightNode->_prev;
+				link_node(leftNode, newNode, rightNode);
+				++_size;
+			}
+		}
+
+		iterator insert(iterator pos, element_type&& value)
+		{
+			if (pos._currentNode == nullptr) throw std::runtime_error("Invalid iterator.");
+			
+			node* newNode = new node(std::move(value));
+			dummy_node* rightNode = pos._currentNode;
+			dummy_node* leftNode = rightNode->_prev;
+			link_node(leftNode, newNode, rightNode);
+			++_size;
+
+			return iterator(newNode);
+		}
+
+		void erase(iterator pos)
+		{
+			if (pos._currentNode == nullptr) throw std::runtime_error("Invalid iterator.");
+			dummy_node* currentNode = pos._currentNode;
+			if (currentNode == &_frontDummy) throw std::runtime_error("Invalid iterator.");
+			if (currentNode == &_backDummy) throw std::runtime_error("Invalid iterator.");
+
+			node* eraseNode = static_cast<node*>(currentNode);
+			dummy_node* lNode = eraseNode->_prev;
+			dummy_node* rNode = eraseNode->_next;
+			link_node(lNode, rNode);
+			SafeDelete(eraseNode);
+			--_size;
+		}
+
 		iterator begin()
 		{
 			return iterator(get_front_node());
@@ -151,51 +194,57 @@ namespace mst
 
 		element_type& front()
 		{
-			iterator front = get_front_node();
-			if (front == nullptr) throw std::runtime_error("front node is null.");
-			else return *front;
+			if (empty()) throw std::runtime_error("list is empty.");
+			else  
+			{
+				iterator front = get_front_node();
+				return *front;
+			}
 		}
 
 		const element_type& front() const
 		{
-			const node* front = static_cast<const node*>(get_front_node());
-			if (front == nullptr) throw std::runtime_error("front node is null.");
-			else return front->_data;
+			if (empty()) throw std::runtime_error("list is empty.");
+			else
+			{
+				const_iterator front = static_cast<const node*>(get_front_node());
+				return *front;
+			}
 		}
 
 		element_type& back()
-		{
-			iterator back = get_back_node();
-			if (back == nullptr) throw std::runtime_error("back node is null.");
-			else return *back;
+		{		
+			if (empty()) throw std::runtime_error("list is empty.");
+			else
+			{
+				iterator back = get_back_node();
+				return *back;
+			}
 		}
 
 		const element_type& back() const
-		{
-			const node* back = static_cast<const node*>(get_back_node());
-			if (back == nullptr) throw std::runtime_error("back node is null.");
-			else return back->_data;
+		{	
+			if (empty()) throw std::runtime_error("list is empty.");
+			else
+			{
+				const_iterator back = static_cast<const node*>(get_back_node());
+				return *back;
+			}	
 		}
 
 		template<typename VT>
 		void push_front(VT&& value)
 		{
-			dummy_node* dummy = &_frontDummy;
-			dummy_node* prevFront = get_front_node();
-			node* newFront = new node(std::forward<VT>(value));
-			link_node(dummy, newFront, prevFront);
-			++_size;
+			iterator front = begin();
+			insert(front, std::forward<VT>(value));
 		}
 
 		void pop_front() noexcept
 		{
 			if (empty()) return;
 
-			node* prevFront = static_cast<node*>(get_front_node());
-			dummy_node* newFront = prevFront->_next;
-			link_node(prevFront->_prev, newFront);
-			SafeDelete(prevFront);
-			--_size;
+			iterator front = begin();
+			erase(front);
 		}
 
 		void clear() noexcept
