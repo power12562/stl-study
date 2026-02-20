@@ -35,16 +35,6 @@ namespace mst
 				return &_currentNode->_data;
 			}
 
-			const element_type& operator*() const noexcept
-			{
-				return _currentNode->_data;
-			}
-
-			const element_type* operator->() const noexcept
-			{
-				return &_currentNode->_data;
-			}
-
 			iterator operator++()
 			{
 				if (_currentNode->_next == nullptr) throw std::runtime_error("next iterator is null");
@@ -62,7 +52,7 @@ namespace mst
 
 			iterator operator--()
 			{
-				if (_currentNode->_next == nullptr) throw std::runtime_error("prev iterator is null");
+				if (_currentNode->_prev == nullptr) throw std::runtime_error("prev iterator is null");
 				else _currentNode = _currentNode->_prev;
 				return *this;
 			}
@@ -70,19 +60,14 @@ namespace mst
 			iterator operator--(int)
 			{
 				iterator temp = *this;
-				if (_currentNode->_next == nullptr) throw std::runtime_error("prev iterator is null");
+				if (_currentNode->_prev == nullptr) throw std::runtime_error("prev iterator is null");
 				else _currentNode = _currentNode->_prev;
 				return temp;
 			}
 
 			bool operator==(const iterator& rhs) const noexcept
 			{
-				if (_currentNode != rhs._currentNode) return false;
-				node* lnode = _currentNode;
-				node* rnode = rhs._currentNode;
-				if (lnode->_next != rnode->_next) return false;
-				if (lnode->_prev != rnode->_prev) return false;
-				return true;
+				return _currentNode == rhs._currentNode;
 			}
 
 		private:
@@ -206,7 +191,6 @@ namespace mst
 		size_t _size = 0;
 		node* _front = nullptr;
 		node* _back = nullptr;
-
 
 		void link_node(node* lhs, node* rhs)
 		{
