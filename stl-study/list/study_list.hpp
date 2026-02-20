@@ -8,11 +8,10 @@ namespace mst
 		using element_type = T;
 		using container_type = list<element_type>;
 
-		struct node;
 		struct dummy_node
 		{
-			node* _prev = nullptr;
-			node* _next = nullptr;
+			dummy_node* _prev = nullptr;
+			dummy_node* _next = nullptr;
 		};
 
 		struct node : public dummy_node
@@ -27,19 +26,23 @@ namespace mst
 		{
 			friend class container_type;
 		public:
-			iterator(dummy_node* nd) : _currentNode(static_cast<node*>(nd)) {}
-			iterator(node* nd) : _currentNode(nd) {}
+			iterator(dummy_node* nd) : _currentNode(nd) {}
 			iterator(const iterator& rhs) : _currentNode(rhs._currentNode) {}
 			~iterator() = default;
 
+			element_type& get()
+			{
+				return get_node()->_data;
+			}
+
 			element_type& operator*() noexcept
 			{
-				return _currentNode->_data;
+				return get_node()->_data;
 			}
 
 			element_type* operator->() noexcept
 			{
-				return &_currentNode->_data;
+				return &get_node()->_data;
 			}
 
 			iterator operator++()
@@ -77,21 +80,41 @@ namespace mst
 				return _currentNode == rhs._currentNode;
 			}
 
+			bool operator==(std::nullptr_t nptr) const noexcept
+			{
+				return _currentNode == nptr;
+			}
+
 		private:
-			node* _currentNode = nullptr;
+			dummy_node* _currentNode = nullptr;
+			node* get_node()
+			{
+				return static_cast<node*>(_currentNode);
+			}
 		};
 
-		list() = default;
+		list()
+		{
+			reset_field();
+		}
 		~list()
 		{
 			clear();
 		}
 
+		size_t size() const
+		{
+			return _size;
+		}
+
+		bool empty() const
+		{
+			return _size == 0;
+		}
+
 		iterator begin()
 		{
-			node* front = get_front_node();
-			if (front == nullptr) return end();
-			else return iterator(front);
+			return iterator(get_front_node());
 		}
 
 		iterator end()
@@ -101,28 +124,28 @@ namespace mst
 
 		element_type& front()
 		{
-			node* front = get_front_node();
+			iterator front = get_front_node();
 			if (front == nullptr) throw std::runtime_error("front node is null.");
-			else return front->_data;
+			else return *front;
 		}
 
 		const element_type& front() const
 		{
-			const node* front = get_front_node();
+			const node* front = static_cast<const node*>(get_front_node());
 			if (front == nullptr) throw std::runtime_error("front node is null.");
 			else return front->_data;
 		}
 
 		element_type& back()
 		{
-			node* back = get_back_node();
+			iterator back = get_back_node();
 			if (back == nullptr) throw std::runtime_error("back node is null.");
-			else return back->_data;
+			else return *back;
 		}
 
 		const element_type& back() const
 		{
-			const node* back = get_back_node();
+			const node* back = static_cast<const node*>(get_back_node());
 			if (back == nullptr) throw std::runtime_error("back node is null.");
 			else return back->_data;
 		}
@@ -130,35 +153,22 @@ namespace mst
 		template<typename VT>
 		void push_front(VT&& value)
 		{
-			node* prevFront = get_front_node();
+			dummy_node* dummy = &_frontDummy;
+			dummy_node* prevFront = get_front_node();
 			node* newFront = new node(std::forward<VT>(value));
-			if (0 < _size)
-			{
-				link_node(newFront, prevFront);
-			}
-			else
-			{
-				set_front_node(newFront);
-				set_back_node(newFront);
-			}
+			link_node(dummy, newFront, prevFront);
 			++_size;
 		}
 
 		void pop_front() noexcept
 		{
-			node* prevFront = get_front_node();
-			if (prevFront != nullptr)
-			{
-				node* newFront = prevFront->_next;
-				if (newFront != nullptr)
-				{
-					newFront->_prev = nullptr;
-				}
-				SafeDelete(prevFront);
-				set_front_node(newFront);
-				if (_size == 1) set_back_node(nullptr);
-				--_size;
-			}
+			if (empty()) return;
+
+			node* prevFront = static_cast<node*>(get_front_node());
+			dummy_node* newFront = prevFront->_next;
+			link_node(prevFront->_prev, newFront);
+			SafeDelete(prevFront);
+			--_size;
 		}
 
 		void clear() noexcept
@@ -173,9 +183,7 @@ namespace mst
 					++iter;
 					SafeDelete(curr._currentNode);
 				}
-				_size = 0;
-				set_front_node(nullptr);
-				set_back_node(nullptr);
+				reset_field();
 			}	
 		}
 
@@ -195,46 +203,45 @@ namespace mst
 		dummy_node _frontDummy;
 		dummy_node _backDummy;
 
-		node* get_front_node()
+		void reset_field()
+		{
+			_size = 0;
+			_frontDummy._next = &_backDummy;
+			_backDummy._prev = &_frontDummy;
+		}
+
+		dummy_node* get_front_node()
 		{
 			return _frontDummy._next;
 		}
 
-		const node* get_front_node() const
+		const dummy_node* get_front_node() const
 		{
 			return _frontDummy._next;
 		}
 
-		void set_front_node(node* nd)
-		{
-			_frontDummy._next = nd;
-			if (nd != nullptr) nd->_prev = static_cast<node*>(&_frontDummy);	
-		}
-
-		node* get_back_node()
+		dummy_node* get_back_node()
 		{
 			return _backDummy._prev;
 		}
 
-		const node* get_back_node() const
+		const dummy_node* get_back_node() const
 		{
 			return _backDummy._prev;
 		}
 
-		void set_back_node(node* nd)
+		void link_node(dummy_node* lhs, dummy_node* mhs, dummy_node* rhs)
 		{
-			_backDummy._prev = nd;
-			if (nd != nullptr) nd->_next = static_cast<node*>(&_backDummy);
+			lhs->_next = mhs;
+			mhs->_prev = lhs;
+			mhs->_next = rhs;
+			rhs->_prev = mhs;
 		}
 
-		void link_node(node* lhs, node* rhs)
+		void link_node(dummy_node* lhs, dummy_node* rhs)
 		{
-			node* front = get_front_node();
-			node* back = get_back_node();
-			lhs->_next = rhs;
 			rhs->_prev = lhs;
-			if (front == rhs) set_front_node(lhs);
-			else if (back == lhs) set_back_node(rhs);
+			lhs->_next = rhs;
 		}
 	};
 
