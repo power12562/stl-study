@@ -1,8 +1,18 @@
-﻿#include "vector/study_vector.hpp"
+﻿#define _CRTDBG_MAP_ALLOC
+#include <cstdlib>
+#include <crtdbg.h>
+
+#ifdef _DEBUG
+#define new new(_NORMAL_BLOCK, __FILE__, __LINE__)
+#endif
+
+#include "vector/study_vector.hpp"
 #include "vector/vector_test.hpp"
 
-template <typename T>
-static void vector_test_entry()
+#include "list/study_list.hpp"
+#include "list/list_test.h"
+
+static void vector_test()
 {
     // 1. stl 테스트
     run_vector_test<std::vector<int>, int>({ 1, 2, 3, 4, 5 });
@@ -28,11 +38,29 @@ static void vector_test_entry()
     std::cout << "\nAll Tests Finished Successfully!\n";
 }
 
+static void list_test()
+{
+    std::list<int> slt;
+
+    mst::list<int> mlt;
+    for (int i = 1; i <= 10; i++)
+    {
+        mlt.push_front(i);
+    }
+   
+    auto iter = mlt.begin();
+    for (auto iter = mlt.begin(); iter != mlt.end(); ++iter)
+    {
+        std::cout << *iter << std::endl;
+    }
+}
+
 int main()
 {
-    vector_test_entry<int>();
+    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
-    std::vector<int> std;
+    //vector_test();
+    list_test();
 
     return 0;
 }

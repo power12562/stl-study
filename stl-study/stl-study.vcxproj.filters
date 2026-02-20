@@ -18,9 +18,6 @@
     <ClCompile Include="stl-study.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="vector\study_vector.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common\memory.h">
@@ -30,6 +27,12 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="vector\vector_test.hpp">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="list\study_list.hpp">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="list\list_test.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
