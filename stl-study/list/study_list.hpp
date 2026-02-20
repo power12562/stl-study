@@ -90,21 +90,13 @@ namespace mst
 		iterator begin()
 		{
 			node* front = get_front_node();
-			if (front == nullptr) throw std::runtime_error("front node is null.");
-			else
-			{
-				return iterator(front);
-			}
+			if (front == nullptr) return end();
+			else return iterator(front);
 		}
 
 		iterator end()
 		{
-			node* back = get_back_node();
-			if (back == nullptr) throw std::runtime_error("back node is null.");
-			else
-			{
-				return iterator(&_backDummy);
-			}
+			return iterator(&_backDummy);
 		}
 
 		element_type& front()

@@ -40,8 +40,6 @@ static void vector_test()
 
 static void list_test()
 {
-    std::list<int> slt;
-
     mst::list<int> mlt;
     for (int i = 1; i <= 10; i++)
     {
@@ -49,6 +47,12 @@ static void list_test()
     }
    
     auto iter = mlt.begin();
+    for (auto iter = mlt.begin(); iter != mlt.end(); ++iter)
+    {
+        std::cout << *iter << std::endl;
+    }
+
+    mlt.clear();
     for (auto iter = mlt.begin(); iter != mlt.end(); ++iter)
     {
         std::cout << *iter << std::endl;
