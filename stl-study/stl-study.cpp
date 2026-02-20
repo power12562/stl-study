@@ -40,15 +40,16 @@ static void vector_test()
 
 static void list_test()
 {
-    std::list<int> list;
+    std::list<int> stl;
 
     mst::list<int> mlt;
     for (int i = 1; i <= 10; i++)
     {
         mlt.push_front(i);
     }
-   
-    for (auto iter = mlt.begin(); iter != mlt.end(); ++iter)
+
+    const mst::list<int>& cmlt = mlt;
+    for (auto iter = cmlt.cbegin(); iter != cmlt.cend(); ++iter)
     {
         std::cout << *iter << std::endl;
     }
@@ -60,6 +61,9 @@ static void list_test()
     }
     std::cout << mlt.size();
     std::cout << std::endl;
+
+
+
 }
 
 int main()

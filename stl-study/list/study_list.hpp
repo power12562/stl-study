@@ -21,55 +21,65 @@ namespace mst
 		};
 
 	public:
-
-		class iterator
+		template <bool CONST_ITER>
+		class iterator_template
 		{
+			using iter_type = iterator_template<CONST_ITER>;
+			using iterator = iterator_template<false>;
+			using const_iterator = iterator_template<true>;
+			using iter_element_type = std::conditional_t<CONST_ITER, const element_type, element_type>;
+			using iter_node_dummy_type = std::conditional_t<CONST_ITER, const dummy_node, dummy_node>;
+			using iter_node_type = std::conditional_t<CONST_ITER, const node, node>;
 			friend class container_type;
+
 		public:
-			iterator(dummy_node* nd) : _currentNode(nd) {}
-			iterator(const iterator& rhs) : _currentNode(rhs._currentNode) {}
-			~iterator() = default;
+			iterator_template(iter_node_dummy_type* nd) : _currentNode(nd) {}
+			iterator_template(const iter_type& rhs) = default;
+			~iterator_template() = default;
 
-			element_type& get()
+			template <bool rhsConst> 
+			iterator_template(const iterator_template<rhsConst>& rhs) requires (CONST_ITER && !rhsConst) : _currentNode(rhs._currentNode) {}
+
+			iter_element_type& get() const
 			{
 				return get_node()->_data;
 			}
 
-			element_type& operator*() noexcept
+			iter_element_type& operator*() const noexcept
 			{
 				return get_node()->_data;
 			}
 
-			element_type* operator->() noexcept
+			iter_element_type* operator->() const noexcept
 			{
 				return &get_node()->_data;
 			}
 
-			iterator operator++()
+			iter_type operator++()
 			{
 				if (_currentNode->_next == nullptr) throw std::runtime_error("next iterator is null");
 				else _currentNode = _currentNode->_next;
 				return *this;
 			}
 
-			iterator operator++(int)
+			iter_type operator++(int)
 			{
-				iterator temp = *this;
+				iter_type temp = *this;
 				if (_currentNode->_next == nullptr) throw std::runtime_error("next iterator is null");
 				else _currentNode = _currentNode->_next;
 				return temp;
 			}
 
-			iterator operator--()
+			iter_type operator--()
 			{
 				if (_currentNode->_prev == nullptr) throw std::runtime_error("prev iterator is null");
 				else _currentNode = _currentNode->_prev;
 				return *this;
 			}
 
-			iterator operator--(int)
+			iter_type operator--(int)
 			{
-				iterator temp = *this;
+				iter_type temp = *this;
 				if (_currentNode->_prev == nullptr) throw std::runtime_error("prev iterator is null");
 				else _currentNode = _currentNode->_prev;
 				return temp;
@@ -80,18 +90,25 @@ namespace mst
 				return _currentNode == rhs._currentNode;
 			}
 
+			bool operator==(const const_iterator& rhs) const noexcept
+			{
+				return _currentNode == rhs._currentNode;
+			}
+
 			bool operator==(std::nullptr_t nptr) const noexcept
 			{
 				return _currentNode == nptr;
 			}
 
 		private:
-			dummy_node* _currentNode = nullptr;
-			node* get_node()
+			iter_node_dummy_type* _currentNode = nullptr;
+			iter_node_type* get_node() const
 			{
-				return static_cast<node*>(_currentNode);
+				return static_cast<iter_node_type*>(_currentNode);
 			}
 		};
+		using iterator = iterator_template<false>;
+		using const_iterator = iterator_template<true>;
 
 		list()
 		{
@@ -120,6 +137,16 @@ namespace mst
 		iterator end()
 		{
 			return iterator(&_backDummy);
+		}
+
+		const_iterator cbegin() const
+		{
+			return const_iterator(get_front_node());
+		}
+
+		const_iterator cend() const
+		{
+			return const_iterator(&_backDummy);
 		}
 
 		element_type& front()
