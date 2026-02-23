@@ -11,9 +11,112 @@ namespace mst
 	{
 		using element_type = T;
 		using container_type = vector<T>;
-
 		static constexpr size_t max_capacity = std::numeric_limits<size_t>::max();
 	public:
+		template <bool CONST_ITER>
+		class iterator_template
+		{
+			using iter_element_type = std::conditional_t<CONST_ITER, const element_type, element_type>;
+			using iter_type = iterator_template<CONST_ITER>;
+			using iterator = iterator_template<false>;
+			using const_iterator = iterator_template<true>;
+		public:
+			iterator_template() = default;
+			iterator_template(iter_element_type* elementPointer) : _currentPointer(elementPointer) {}
+			~iterator_template() noexcept = default;
+
+			template <bool rhsConst>
+			iterator_template(const iterator_template<rhsConst>& rhs) requires (CONST_ITER && !rhsConst) : _currentPointer(rhs._currentPointer) {}
+
+			iter_element_type& operator*() const noexcept 
+			{
+				return *_currentPointer;
+			}
+
+			iter_element_type* operator->() const noexcept
+			{
+				return _currentPointer;
+			}
+
+			iter_element_type& operator[](size_t index) const noexcept
+			{
+				return _currentPointer[index];
+			}
+
+			iter_type operator+(size_t offset) const
+			{
+				iter_element_type* newOffset = _currentPointer + offset;
+				return iter_type(newOffset);
+			}
+
+			iter_type operator++() 
+			{
+				_currentPointer += 1;
+				return *this;
+			}
+
+			iter_type operator++(int) 
+			{
+				iter_type temp = *this;
+				_currentPointer += 1;
+				return temp;
+			}
+
+			iter_type operator-(size_t offset) const
+			{
+				iter_element_type* newOffset = _currentPointer - offset;
+				return iter_type(newOffset);
+			}
+
+			std::ptrdiff_t operator-(iter_type rhs) const
+			{
+				return _currentPointer - rhs._currentPointer;
+			}
+
+			iter_type operator--()
+			{
+				_currentPointer -= 1;
+				return *this;
+			}
+
+			iter_type operator--(int)
+			{
+				iter_type temp = *this;
+				_currentPointer -= 1;
+				return temp;
+			}
+
+			template <bool rhsConst> bool operator==(const iterator_template<rhsConst>& rhs) const
+			{
+				return _currentPointer == rhs._currentPointer;
+			}
+
+			template <bool rhsConst> bool operator<(const iterator_template<rhsConst>& rhs) const
+			{
+				return _currentPointer < rhs._currentPointer;
+			}
+
+			template <bool rhsConst> bool operator<=(const iterator_template<rhsConst>& rhs) const
+			{
+				return _currentPointer <= rhs._currentPointer;
+			}
+
+			template <bool rhsConst> bool operator>(const iterator_template<rhsConst>& rhs) const
+			{
+				return _currentPointer > rhs._currentPointer;
+			}
+
+			template <bool rhsConst> bool operator>=(const iterator_template<rhsConst>& rhs) const
+			{
+				return _currentPointer >= rhs._currentPointer;
+			}
+
+		private:
+			iter_element_type* _currentPointer = nullptr;
+		};
+		using iterator = iterator_template<false>;
+		using const_iterator = iterator_template<true>;
+
 		friend void swap(container_type& lhs, container_type& rhs) noexcept
 		{
 			using std::swap;
@@ -84,6 +187,28 @@ namespace mst
 			}
 		}
 
+		iterator begin()
+		{
+			return iterator(_memory);
+		}
+
+		iterator end()
+		{
+			element_type* newOffset = _memory + _size;
+			return iterator(newOffset);
+		}
+
+		const_iterator cbegin() const
+		{
+			return const_iterator(_memory);
+		}
+
+		const_iterator cend() const
+		{
+			element_type* newOffset = _memory + _size;
+			return const_iterator(newOffset);
+		}
+
 		void clear() noexcept
 		{
 			FreeMem(_memory, _size);
@@ -122,7 +247,7 @@ namespace mst
 			return _memory[index];
 		}
 
-		container_type& operator=(const container_type rhs)
+		container_type& operator=(container_type rhs)
 		{
 			swap(*this, rhs);
 			return *this;

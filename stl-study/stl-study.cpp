@@ -14,18 +14,6 @@
 
 static void vector_test()
 {
-    // 1. stl 테스트
-    run_vector_test<std::vector<int>, int>({ 1, 2, 3, 4, 5 });
-    run_vector_test<std::vector<std::string>, std::string>({ "Apple", "Banana", "Cherry" });
-    Tracker::alive_count = 0;
-    {
-        run_vector_test<std::vector<Tracker>, Tracker>({ Tracker(1), Tracker(2) });
-    }
-    assert(Tracker::alive_count == 0);
-    std::cout << "Tracker Memory Leak Check: Pass (All objects destroyed)\n";
-    std::cout << "----------------------------------------------------------\n";
-
-    // 2. 내 타입 테스트
     run_vector_test<mst::vector<int>, int>({ 1, 2, 3, 4, 5 });
     run_vector_test<mst::vector<std::string>, std::string>({ "Apple", "Banana", "Cherry" });
     Tracker::alive_count = 0;
@@ -35,6 +23,27 @@ static void vector_test()
     assert(Tracker::alive_count == 0);
     std::cout << "Tracker Memory Leak Check: Pass (All objects destroyed)\n";
 
+    mst::vector<int> test{ 1,2,3,4,5 };
+    auto iter = test.begin();
+    std::cout << *iter << std::endl;
+    auto iter2 = iter + 2;
+    std::cout << *iter2 << std::endl;
+    auto iter1 = iter2 - 1;
+    std::cout << *iter1 << std::endl;
+    for (auto iter = test.begin(); iter != test.end(); iter++)
+    {
+        std::cout << *iter << ", ";
+    }
+    std::cout << std::endl;
+    *iter = 0;
+    *iter2 = 0;
+
+    const auto& cTest = test;
+    for (auto citer = cTest.cbegin(); citer != cTest.cend(); citer++)
+    {
+        std::cout << *citer << ", ";
+    }
+    std::cout << std::endl;
     std::cout << "\nAll Tests Finished Successfully!\n";
 }
 
@@ -76,8 +85,8 @@ int main()
 {
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
-    //vector_test();
-    list_test();
+    vector_test();
+    //list_test();
 
     return 0;
 }
