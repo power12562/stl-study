@@ -35,7 +35,6 @@ namespace mst
 		public:
 			iterator_template() = default;
 			iterator_template(iter_node_dummy_type* nd) : _currentNode(nd) {}
-			iterator_template(const iter_type& rhs) = default;
 			~iterator_template() = default;
 
 			template <bool rhsConst> 
