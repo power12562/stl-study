@@ -49,9 +49,6 @@ static void vector_test()
 
 static void list_test()
 {
-    std::list<int> stl;
-    auto be = stl.begin();
-
     mst::list<int> mlt;
     mst::list<int>::iterator fiveIter;
     for (int i = 1; i <= 10; i++)
@@ -78,6 +75,16 @@ static void list_test()
     }
     std::cout << mlt.size();
 
+    mst::list<int> copySrc{ 1,2,3,4,5 };
+    mst::list<int> copyTarget;
+    copyTarget = copySrc;
+    mst::list<int> moveTarget;
+    moveTarget = std::move(copySrc);
+
+    copyTarget.clear();
+    moveTarget.clear();
+    copySrc.clear();
+
     std::cout << std::endl;
 }
 
@@ -85,8 +92,8 @@ int main()
 {
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
-    vector_test();
-    //list_test();
+    //vector_test();
+    list_test();
 
     return 0;
 }

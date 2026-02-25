@@ -107,10 +107,72 @@ namespace mst
 		using iterator = iterator_template<false>;
 		using const_iterator = iterator_template<true>;
 
+		friend void swap(container_type& lhs, container_type& rhs)
+		{
+			using std::swap;
+			swap(lhs._frontDummy._next, rhs._frontDummy._next);
+			swap(lhs._backDummy._prev, rhs._backDummy._prev);
+			swap(lhs._size, rhs._size);
+
+			if (lhs.size() != 0)
+			{
+				lhs._frontDummy._next->_prev = &lhs._frontDummy;
+				lhs._backDummy._prev->_next = &lhs._backDummy;
+			}
+			else
+			{
+				lhs.reset_field();
+			}
+
+			if (rhs.size() != 0)
+			{
+				rhs._frontDummy._next->_prev = &rhs._frontDummy;
+				rhs._backDummy._prev->_next = &rhs._backDummy;
+			}
+			else
+			{
+				rhs.reset_field();
+			}
+		}
+
 		list()
 		{
 			reset_field();
 		}
+
+		list(std::initializer_list<element_type> list)
+		{
+			reset_field();
+			for (auto& item : list)
+			{
+				push_back(item);
+			}
+		}
+
+		list(const container_type& rhs)
+		{
+			reset_field();
+			if (rhs.size() != 0)
+			{
+				for (auto& value : rhs)
+				{
+					push_back(value);
+				}
+			}
+		}
+
+		list(container_type&& rhs) noexcept
+		{
+			reset_field();
+			swap(*this, rhs);
+		}
+
+		container_type& operator=(container_type rhs)
+		{
+			swap(*this, rhs);
+			return *this;
+		}
+
 		~list()
 		{
 			clear();
@@ -177,6 +239,16 @@ namespace mst
 		iterator end()
 		{
 			return iterator(&_backDummy);
+		}
+
+		const_iterator begin() const
+		{
+			return cbegin();
+		}
+		
+		const_iterator end() const
+		{
+			return cend();
 		}
 
 		const_iterator cbegin() const
@@ -307,7 +379,7 @@ namespace mst
 			return _backDummy._prev;
 		}
 
-		void link_node(dummy_node* lhs, dummy_node* mhs, dummy_node* rhs)
+		static void link_node(dummy_node* lhs, dummy_node* mhs, dummy_node* rhs)
 		{
 			lhs->_next = mhs;
 			mhs->_prev = lhs;
@@ -315,7 +387,7 @@ namespace mst
 			rhs->_prev = mhs;
 		}
 
-		void link_node(dummy_node* lhs, dummy_node* rhs)
+		static void link_node(dummy_node* lhs, dummy_node* rhs)
 		{
 			rhs->_prev = lhs;
 			lhs->_next = rhs;
