@@ -198,6 +198,17 @@ namespace mst
 			return iterator(newOffset);
 		}
 
+		const_iterator begin() const
+		{
+			return const_iterator(_memory);
+		}
+
+		const_iterator end() const
+		{
+			element_type* newOffset = _memory + _size;
+			return const_iterator(newOffset);
+		}
+
 		const_iterator cbegin() const
 		{
 			return const_iterator(_memory);
@@ -248,12 +259,6 @@ namespace mst
 		}
 
 		container_type& operator=(container_type rhs)
-		{
-			swap(*this, rhs);
-			return *this;
-		}
-
-		container_type& operator=(container_type&& rhs) noexcept
 		{
 			swap(*this, rhs);
 			return *this;
