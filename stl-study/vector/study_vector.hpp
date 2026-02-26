@@ -20,6 +20,7 @@ namespace mst
 			using iter_type = iterator_template<CONST_ITER>;
 			using iterator = iterator_template<false>;
 			using const_iterator = iterator_template<true>;
+			friend class container_type;
 		public:
 			iterator_template() = default;
 			iterator_template(iter_element_type* elementPointer) : _currentPointer(elementPointer) {}
@@ -246,6 +247,29 @@ namespace mst
 			size_t lastIndex = _size - 1;
 			std::destroy_at(&_memory[lastIndex]);
 			--_size;
+		}
+
+		iterator erase(iterator pos)
+		{
+			size_t index = pos - begin();
+			size_t lastIndex = size() - 1;
+
+			if constexpr (std::is_trivially_copyable_v<element_type>)
+			{
+				size_t cpyStart = index + 1;
+				std::memmove(&_memory[index], &_memory[cpyStart], sizeof(T) * (size() - cpyStart));
+			}
+			else
+			{
+				for (size_t i = index; i < lastIndex; ++i)
+				{
+					_memory[i] = std::move(_memory[i + 1]);
+				}
+				std::destroy_at(&_memory[lastIndex]);
+			}
+			--_size;
+
+			return begin() + index;
 		}
 
 		element_type& operator[] (size_t index) noexcept

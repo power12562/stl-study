@@ -35,8 +35,8 @@ static void vector_test()
         std::cout << *iter << ", ";
     }
     std::cout << std::endl;
-    *iter = 0;
     *iter2 = 0;
+    test.erase(iter2);
 
     const auto& cTest = test;
     for (auto citer = cTest.cbegin(); citer != cTest.cend(); citer++)
@@ -92,8 +92,8 @@ int main()
 {
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
-    //vector_test();
-    list_test();
+    vector_test();
+    //list_test();
 
     return 0;
 }
