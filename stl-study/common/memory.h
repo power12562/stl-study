@@ -29,7 +29,7 @@ namespace mst
 	}
 
 	template <typename T>
-	void SafeMove(T* src, T* dst, size_t size)
+	void SafeMove(T* dst, T* src, size_t size)
 	{
 		if (src == nullptr || dst == nullptr)
 		{
@@ -38,7 +38,7 @@ namespace mst
 
 		if constexpr (std::is_trivially_copyable_v<T>)
 		{
-			std::memcpy(src, dst, sizeof(T) * size);
+			std::memcpy(dst, src, sizeof(T) * size);
 		}
 		else
 		{
@@ -46,18 +46,18 @@ namespace mst
 			{
 				if constexpr (std::is_nothrow_move_constructible_v<T>)
 				{
-					std::construct_at(&src[i], std::move(dst[i]));
+					std::construct_at(&dst[i], std::move(src[i]));
 				}
 				else
 				{
-					std::construct_at(&src[i], dst[i]);
+					std::construct_at(&dst[i], src[i]);
 				}
 			}
 		}
 
 		for (size_t i = 0; i < size; ++i)
 		{
-			std::destroy_at(&dst[i]);
+			std::destroy_at(&src[i]);
 		}
 	}
 
