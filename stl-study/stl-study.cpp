@@ -123,6 +123,23 @@ static void vector_test()
         std::cout << std::endl;
     }
 
+    {
+        mst::vector<std::unique_ptr<int>> ptrTest;
+        std::unique_ptr<int> p1 = std::make_unique<int>(0);
+        // ptrTest.push_back(p1); // 컴파일러 에러. copy 금지
+        ptrTest.push_back(std::move(p1)); // move는 가능
+        for (int i = 1; i <= 10; i++)
+        {
+            ptrTest.push_back(std::make_unique<int>(i)); // xvalue도 가능
+        }
+
+        for (auto& ptr : ptrTest)
+        {
+            std::cout << *ptr << ", ";
+        }
+        std::cout << std::endl;
+    }
+
     std::cout << "\nAll Tests Finished Successfully!\n";
 }
 

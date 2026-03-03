@@ -419,9 +419,20 @@ namespace mst
 
 		vector(const container_type& rhs)
 		{
-			size_t rhsSize = rhs.size();
-			resize(rhsSize);
-			SafeCopy(_memory, rhs._memory, rhsSize);
+			reserve(rhs.capacity());
+			if constexpr (std::is_trivially_copyable_v<element_type>)
+			{
+				std::memcpy(_memory, rhs._memory, sizeof(element_type) * rhs.size());
+			}
+			else
+			{
+				size_t size = rhs.size();
+				for (size_t i = 0; i < size; ++i)
+				{
+					std::construct_at(&_memory[i], rhs[i]);
+				}
+			}
+			_size = rhs.size();
 		}
 
 		vector(container_type&& rhs) noexcept
