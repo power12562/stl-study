@@ -12,6 +12,47 @@
 #include "list/study_list.hpp"
 #include "list/list_test.h"
 
+struct Base
+{
+    Base() = default;
+    Base(const Base& rhs) = default;
+    Base& operator=(const Base& rhs) = default;
+    Base(int i) : _i(i) {}
+    virtual ~Base() = default;
+    virtual void foo() = 0;
+
+protected:
+    int _i = 0;
+};
+
+struct Drived : public Base
+{
+    Drived() = default;
+    ~Drived() override
+    {
+        _i = -1;
+    }
+    Drived(const Drived& rhs) = default;
+    Drived(Drived&& rhs) noexcept
+    {
+        _i = rhs._i;
+        rhs._i = -1;
+    }
+    Drived& operator=(const Drived& rhs) = default;
+    Drived& operator=(Drived&& rhs) noexcept
+    {
+        _i = rhs._i;
+        rhs._i = -1;
+        return *this;
+    }
+    Drived(int i) : Base(i) {}
+    void foo() override
+    {
+        std::cout << _i;
+    }
+};
+
+
 static void vector_test()
 {
     run_vector_test<mst::vector<int>, int>({ 1, 2, 3, 4, 5 });
@@ -44,6 +85,44 @@ static void vector_test()
         std::cout << *citer << ", ";
     }
     std::cout << std::endl;
+
+    {
+        mst::vector<int> insertTest;
+        auto iter = insertTest.insert(insertTest.begin(), 0);
+        iter = insertTest.insert(insertTest.end(), 2);
+        insertTest.insert(iter, 1);
+
+        for (auto& i : insertTest)
+        {
+            std::cout << i << ", ";
+        }
+        std::cout << std::endl;
+    }
+
+    {
+        mst::vector<int> insertTest;
+        auto iter = insertTest.insert(insertTest.begin(), { 0, 1, 6, 7, 8 });
+        insertTest.insert(iter + 2, { 2, 3, 4, 5 });
+
+        for (auto& i : insertTest)
+        {
+            std::cout << i << ", ";
+        }
+        std::cout << std::endl;
+    }
+
+    {
+        mst::vector<Drived> insertTest;
+        auto iter = insertTest.insert(insertTest.begin(), { 0, 1, 6, 7, 8 });
+        insertTest.insert(iter + 2, { 2, 3, 4, 5 });
+        for (auto& item : insertTest)
+        {
+            item.foo();
+            std::cout << ", ";
+        }
+        std::cout << std::endl;
+    }
+
     std::cout << "\nAll Tests Finished Successfully!\n";
 }
 

@@ -154,19 +154,24 @@ namespace mst
 						reserve(newSize);
 					}
 
-					for (size_t i = prevSize; i < newSize; i++)
+					if constexpr (std::is_trivially_copyable_v<element_type> == false)
 					{
-						std::construct_at(&_memory[i]);
+						for (size_t i = prevSize; i < newSize; i++)
+						{
+							std::construct_at(&_memory[i]);
+						}
 					}
 				}
 				else
 				{
-					for (size_t i = newSize; i < prevSize; i++)
+					if constexpr (std::is_trivially_copyable_v<element_type> == false)
 					{
-						std::destroy_at(&_memory[i]);
+						for (size_t i = newSize; i < prevSize; i++)
+						{
+							std::destroy_at(&_memory[i]);
+						}
 					}
 				}
-
 				_size = newSize;
 			}	
 		}
@@ -249,6 +254,107 @@ namespace mst
 			--_size;
 		}
 
+		template<typename VT>
+		iterator insert(iterator pos, VT&& value)
+		{
+			size_t index = pos - begin();
+			if (0 < size())
+			{
+				size_t lastIndex = size();
+				if (_capacity <= lastIndex)
+				{
+					size_t newCapacity = GetNewCapacitySize();
+					reserve(newCapacity);
+				}
+
+				if constexpr (std::is_trivially_copyable_v<element_type>)
+				{
+					size_t dstStart = index + 1;
+					size_t cpyCount = lastIndex - index;
+					std::memmove(&_memory[dstStart], &_memory[index], sizeof(element_type) * cpyCount);
+				}
+				else
+				{
+					std::construct_at(&_memory[lastIndex], std::move(_memory[lastIndex - 1]));
+					for (size_t i = lastIndex - 1; i > index; --i)
+					{
+						_memory[i] = std::move(_memory[i - 1]);
+					}
+				}
+				_memory[index] = std::forward<VT>(value);
+				++_size;
+			}
+			else
+			{
+				push_back(std::forward<VT>(value));
+			}
+			return begin() + index;
+		}
+
+		iterator insert(iterator pos, std::initializer_list<element_type> list)
+		{
+			size_t index = pos - begin();
+			size_t listSize = list.size();
+			size_t newSize = size() + listSize;
+			size_t lastIndex = size() - 1;
+			if (_capacity < newSize)
+			{
+				reserve(newSize);
+			}
+
+			if (0 < size())
+			{		
+				if constexpr (std::is_trivially_copyable_v<element_type>)
+				{
+					size_t dstIndex = index + listSize;
+					size_t cpyCount = size() - index;
+					std::memmove(&_memory[dstIndex], &_memory[index], sizeof(element_type) * cpyCount);
+					std::memcpy(&_memory[index], list.begin(), sizeof(element_type) * listSize);
+				}
+				else
+				{
+					size_t newLastIndex = newSize - 1;
+					for (size_t i = newLastIndex; i > lastIndex; --i)
+					{
+						if (i >= listSize)
+						{
+							size_t cpyIndex = i - listSize;
+							if (index <= cpyIndex)
+							{
+								std::construct_at(&_memory[i], std::move(_memory[cpyIndex]));
+								continue;
+							}
+						}
+						auto listIter = list.begin();
+						std::construct_at(&_memory[i], listIter[i - index]);
+					}
+
+					auto listIter = list.begin();
+					for (size_t i = index; i <= lastIndex; ++i)
+					{
+						_memory[i] = listIter[i - index];
+					}
+				}
+			}
+			else
+			{
+				if constexpr (std::is_trivially_copyable_v<element_type>)
+				{
+					std::memcpy(&_memory[0], list.begin(), sizeof(element_type) * listSize);
+				}
+				else
+				{
+					auto listIter = list.begin();
+					for (size_t i = 0; i < listSize; ++i)
+					{
+						std::construct_at(&_memory[i], listIter[i]);
+					}
+				}		
+			}
+			_size = newSize;
+			return begin() + index;
+		}
+
 		iterator erase(iterator pos)
 		{
 			size_t index = pos - begin();
@@ -257,7 +363,8 @@ namespace mst
 			if constexpr (std::is_trivially_copyable_v<element_type>)
 			{
 				size_t cpyStart = index + 1;
-				std::memmove(&_memory[index], &_memory[cpyStart], sizeof(T) * (size() - cpyStart));
+				size_t cpyCount = size() - cpyStart;
+				std::memmove(&_memory[index], &_memory[cpyStart], sizeof(element_type) * cpyCount);
 			}
 			else
 			{
