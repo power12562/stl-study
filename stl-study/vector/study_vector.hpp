@@ -155,7 +155,11 @@ namespace mst
 						reserve(newSize);
 					}
 
-					if constexpr (std::is_trivially_copyable_v<element_type> == false)
+					if constexpr (std::is_trivially_copyable_v<element_type>)
+					{
+						std::memset(&_memory[prevSize], 0, sizeof(element_type) * (newSize - prevSize));
+					}
+					else
 					{
 						for (size_t i = prevSize; i < newSize; i++)
 						{
