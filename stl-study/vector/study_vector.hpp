@@ -21,6 +21,7 @@ namespace mst
 			using iterator = iterator_template<false>;
 			using const_iterator = iterator_template<true>;
 			friend class container_type;
+			template <bool> friend class iterator_template;
 		public:
 			iterator_template() = default;
 			iterator_template(iter_element_type* elementPointer) : _currentPointer(elementPointer) {}
