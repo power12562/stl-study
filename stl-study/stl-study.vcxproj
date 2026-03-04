@@ -130,11 +130,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="stl-study.cpp" />
+    <ClCompile Include="test_helper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common\memory.h" />
     <ClInclude Include="list\list_test.h" />
     <ClInclude Include="list\study_list.hpp" />
+    <ClInclude Include="test_helper.h" />
     <ClInclude Include="vector\study_vector.hpp" />
     <ClInclude Include="vector\vector_test.hpp" />
   </ItemGroup>

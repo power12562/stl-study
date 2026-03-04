@@ -326,7 +326,8 @@ namespace mst
 				{
 					iterator curr = iter;
 					++iter;
-					SafeDelete(curr._currentNode);
+					node* eraseNode = static_cast<node*>(curr._currentNode);
+					SafeDelete(eraseNode);
 				}
 				reset_field();
 			}	
