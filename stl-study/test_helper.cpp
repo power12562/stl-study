@@ -1,4 +1,4 @@
-#include "test_helper.h"
+﻿#include "test_helper.h"
 
 void mst::vector_test()
 {
@@ -129,4 +129,27 @@ void mst::list_test()
     copySrc.clear();
 
     std::cout << std::endl;
+
+    {
+        constexpr const char* testStr[] = {
+            "Apply",
+            "Back",
+            "Copy",
+            "Delegate",
+            "Element"
+        };
+
+        mst::list<std::string> strTest;
+        for (auto& str : testStr)
+        {
+            strTest.push_back(str);
+        }
+
+        std::cout << "size :" << strTest.size() << std::endl;
+        for (auto& item : strTest)
+        {
+            std::cout << item << ", ";
+        }
+        std::cout << std::endl;
+    } 
 }
