@@ -17,6 +17,7 @@ namespace mst
 		struct node : public dummy_node
 		{
 			node(const element_type& data) : _data(data) {}
+			node(element_type&& data) noexcept : _data(std::move(data)) {}
 			element_type _data;
 		};
 
