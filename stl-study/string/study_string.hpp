@@ -260,7 +260,7 @@ namespace mst
 		{
 			size_t newLen = length() + len;
 
-			if (capacity() < newLen + 1)
+			if (capacity() <= newLen)
 				reserve(newLen + (newLen >> 1));
 
 			char_t* buffer = data();
