@@ -2,6 +2,7 @@
 #include <string.h>
 #include <cwchar>
 #include <iostream>
+#include <type_traits>
 #include "common/memory.h"
 
 namespace mst
@@ -74,6 +75,8 @@ namespace mst
 	{
 		using char_t = _char_t;
 		using traits_t = _traits_t;
+		using ostream_t = std::conditional_t<std::is_same_v<char, char_t>, std::ostream, std::wostream>;
+
 		static constexpr size_t STACK_BUF_SIZE  = 32;
 		static constexpr size_t STACK_BUF_COUNT = STACK_BUF_SIZE / sizeof(char_t);
 		static constexpr size_t STACK_MAX_LEN   = STACK_BUF_COUNT - 1;
@@ -95,11 +98,12 @@ namespace mst
 			swap(lhs._size, rhs._size);
 		}
 
-		friend std::ostream& operator<<(std::ostream& out, const basic_string& str)
+		friend ostream_t& operator<<(ostream_t& out, const basic_string& str)
 		{
 			out.write(str.c_str(), str.length());
 			return out;
 		}
+		
 
 		~basic_string() 
 		{
@@ -180,7 +184,7 @@ namespace mst
 			}
 		}
 
-		const char* c_str() const noexcept
+		const char_t* c_str() const noexcept
 		{
 			return data();
 		}

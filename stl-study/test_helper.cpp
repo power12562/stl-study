@@ -188,17 +188,16 @@ void mst::string_test()
     }
 
     {
-        mst::string cpySrc = "abcdefghijklmnopqrstuvwxyz";
-        mst::string cpyDst(cpySrc);
+        mst::wstring cpySrc = L"abcdefghijklmnopqrstuvwxyz";
+        mst::wstring cpyDst(cpySrc);
 
-        std::cout << "cpy src :" << cpySrc << "\n";
-        std::cout << "cpy dst :" << cpyDst << "\n";
+        std::wcout << L"cpy src :" << cpySrc << "\n";
+        std::wcout << L"cpy dst :" << cpyDst << "\n";
 
-        mst::string moveDst(std::move(cpySrc));
+        mst::wstring moveDst(std::move(cpySrc));
 
-        std::cout << "cpy src :" << cpySrc << "\n";
-        std::cout << "move dst :"<< moveDst << "\n";
-
+        std::wcout << L"cpy src :" << cpySrc << "\n";
+        std::wcout << L"move dst :"<< moveDst << "\n";
     }
 }
 
