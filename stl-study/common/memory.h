@@ -5,18 +5,6 @@
 namespace mst
 {
 	template <typename T>
-	void SafeDelete(T& pointer) noexcept
-	{
-		static_assert(std::is_pointer_v<T>, "T must be a pointer type.");
-
-		if (pointer != nullptr)
-		{
-			delete pointer;
-			pointer = nullptr;
-		}
-	}
-
-	template <typename T>
 	void SafeFree(T& pointer) noexcept
 	{
 		static_assert(std::is_pointer_v<T>, "T must be a pointer type.");

@@ -226,7 +226,8 @@ namespace mst
 			dummy_node* lNode = eraseNode->_prev;
 			dummy_node* rNode = eraseNode->_next;
 			link_node(lNode, rNode);
-			SafeDelete(eraseNode);
+			delete eraseNode;
+			eraseNode = nullptr;
 			--_size;
 
 			return iterator(rNode);
@@ -328,7 +329,8 @@ namespace mst
 					iterator curr = iter;
 					++iter;
 					node* eraseNode = static_cast<node*>(curr._currentNode);
-					SafeDelete(eraseNode);
+					delete eraseNode;
+					curr._currentNode = nullptr;
 				}
 				reset_field();
 			}	

@@ -156,8 +156,13 @@ void mst::list_test()
 
 void mst::string_test()
 {
-    mst::string str;
-    mst::wstring wstr;
+    mst::string str("hello");
+    mst::wstring wstr(L"world!");
 
+    std::cout << str.data() << " ";
+    std::wcout << wstr.data() << L"\n";
+
+    std::cout << "str cap :" << str.capacity() << "\n";
+    std::cout << "wstr cap :" << wstr.capacity() << "\n";
 }
 

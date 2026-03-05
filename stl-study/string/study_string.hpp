@@ -22,14 +22,14 @@ namespace mst
 			return memcmp(str1, str2, count);
 		}
 
-		static void copy(char_t* dst, const char_t* src, size_t dstSize)
+		static void copy(char_t* dst, const char_t* src, size_t count)
 		{
-			memcpy(dst, src, dstSize);
+			memcpy(dst, src, count);
 		}
 
-		static void move(char_t* dst, const char_t* src, size_t dstSize)
+		static void move(char_t* dst, const char_t* src, size_t count)
 		{
-			memmove(dst, src, dstSize);
+			memmove(dst, src, count);
 		}
 
 		static void assing(char_t* dst, char_t c, size_t count)
@@ -52,14 +52,14 @@ namespace mst
 			return wmemcmp(str1, str2, count);
 		}
 
-		static void copy(char_t* dst, const char_t* src, size_t dstSize)
+		static void copy(char_t* dst, const char_t* src, size_t count)
 		{
-			wmemcpy(dst, src, dstSize);
+			wmemcpy(dst, src, count);
 		}
 
-		static void move(char_t* dst, const char_t* src, size_t dstSize)
+		static void move(char_t* dst, const char_t* src, size_t count)
 		{
-			wmemmove(dst, src, dstSize);
+			wmemmove(dst, src, count);
 		}
 
 		static void assing(char_t* dst, char_t c, size_t count)
@@ -72,22 +72,117 @@ namespace mst
 	class basic_string
 	{
 		using char_t = _char_t;
+		using traits_t = _traits_t;
 		static constexpr size_t STACK_BUF_SIZE  = 32;
 		static constexpr size_t STACK_BUF_COUNT = STACK_BUF_SIZE / sizeof(char_t);
+		static constexpr size_t STACK_MAX_LEN   = STACK_BUF_COUNT - 1;
 		struct stack_buffer
 		{
 			char_t _str[STACK_BUF_SIZE];
 		};
 		struct heap_buffer
 		{
-			size_t  _capacity;
 			char_t* _str;
+			size_t  _capacity;
 		};
 
 	public:
+		~basic_string() 
+		{
+			if (heap_flag())
+			{
+				delete_heap();
+			}
+		}
+
 		basic_string()
 		{
-			std::memset(_stack._str, 0, STACK_BUF_SIZE);
+			reset_stack();
+		}
+
+		basic_string(const char_t* str)
+		{
+			reset_stack();
+			size_t len = traits_t::length(str);
+			if(is_stack_len(len))
+			{
+				cpy_stack(str, len);
+			}
+			else
+			{ 
+
+			}			
+		}
+
+		size_t size() const noexcept { return _size; }
+
+		size_t length() const noexcept { return _size; }
+
+		bool empty() const noexcept { return 0 == size(); }
+
+		size_t capacity() const noexcept
+		{
+			if (heap_flag() == false)
+			{
+				return STACK_BUF_COUNT;			
+			}
+			else
+			{
+				return _heap._capacity;
+			}
+		}
+
+		char_t* data() noexcept
+		{
+			if (heap_flag() == false)
+			{
+				return _stack._str;
+			}
+			else
+			{
+				return _heap._str;
+			}
+		}
+
+		const char_t* data() const noexcept
+		{
+			if (heap_flag() == false)
+			{
+				return _stack._str;
+			}
+			else
+			{
+				return _heap._str;
+			}
+		}
+
+		void reserve(size_t count)
+		{
+			if (count < capacity())
+				return;
+
+			size_t newCapacity = align_up(count);
+			char_t* newStr = new char_t[newCapacity];
+			char& heapFlag = heap_flag();
+			if (heapFlag == false)
+			{
+				if (empty() == false)
+				{
+					traits_t::copy(newStr, _stack._str, _size);
+				}
+				heapFlag = true;
+			}	
+			else
+			{
+				if (empty() == false)
+				{
+					traits_t::copy(newStr, _heap._str, _size);
+				}
+				delete[] _heap._str;
+			}
+			newStr[_size] = '\0';
+			_heap._str = newStr;
+			_heap._capacity = newCapacity;
 		}
 
 	private:
@@ -98,12 +193,53 @@ namespace mst
 		};
 		size_t _size = 0;
 
-		char& stack_flag() 
+		void reset_stack()
+		{
+			std::memset(_stack._str, 0, STACK_BUF_SIZE);
+		}
+
+		void delete_heap()
+		{
+			if (heap_flag())
+			{
+				delete[] _heap._str;
+				_heap._capacity = 0;
+				reset_stack();
+			}
+		}
+
+		char& heap_flag() noexcept
 		{
 			constexpr size_t LAST_BIT_INDEX = STACK_BUF_SIZE - 1;
 			char* stackStr = reinterpret_cast<char*>(_stack._str);
 			return stackStr[LAST_BIT_INDEX];
 		}
+
+		const char& heap_flag() const noexcept
+		{
+			constexpr size_t LAST_BIT_INDEX = STACK_BUF_SIZE - 1;
+			const char* stackStr = reinterpret_cast<const char*>(_stack._str);
+			return stackStr[LAST_BIT_INDEX];
+		}
+
+		static bool is_stack_len(size_t len) noexcept
+		{
+			return len < STACK_MAX_LEN;
+		}
+
+		void cpy_stack(const char_t* src, size_t count)
+		{
+			traits_t::copy(_stack._str, src, count);
+			_stack._str[count] = '\0';
+			_size = count;
+		}
+
+		static constexpr size_t align_up(size_t n) noexcept
+		{
+			// STACK_BUF_SIZE의 배수로
+			return (n + (STACK_BUF_SIZE - 1)) & ~(STACK_BUF_SIZE - 1);
+		}
+
 	};
 
 	using string = basic_string<char>;
