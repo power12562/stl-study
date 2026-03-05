@@ -103,6 +103,35 @@ namespace mst
 			out.write(str.c_str(), str.length());
 			return out;
 		}
+
+		friend basic_string operator+(const basic_string& lhs, const basic_string& rhs)
+		{
+			basic_string temp;
+			temp.reserve(lhs.length() + rhs.length());
+			temp.append(lhs);
+			temp.append(rhs);
+			return temp;
+		}
+
+		friend basic_string operator+(const basic_string& lhs, const char_t* rhs)
+		{
+			basic_string temp;
+			size_t rhsLen = traits_t::length(rhs);
+			temp.reserve(lhs.length() + rhsLen);
+			temp.append(lhs);
+			temp.append(rhs, rhsLen);
+			return temp;
+		}
+
+		friend basic_string operator+(const char_t* lhs, const basic_string& rhs)
+		{
+			basic_string temp;
+			size_t lhsLen = traits_t::length(lhs);
+			temp.reserve(lhsLen + rhs.length());
+			temp.append(lhs, lhsLen);
+			temp.append(rhs);
+			return temp;
+		}
 		
 		~basic_string() 
 		{
@@ -219,12 +248,18 @@ namespace mst
 
 		basic_string& append(const char_t* str)
 		{
-			size_t srcLen = traits_t::length(str);
-			size_t newLen = length() + srcLen;
-			reserve(newLen + (newLen >> 1));
+			return append(str, traits_t::length(str));
+		}
+
+		basic_string& append(const char_t* str, size_t len)
+		{
+			size_t newLen = length() + len;
+
+			if (capacity() < newLen + 1)
+				reserve(newLen + (newLen >> 1));
 
 			char_t* buffer = data();
-			traits_t::copy(&buffer[_size], str, srcLen);
+			traits_t::copy(&buffer[_size], str, len);
 			_size = newLen;
 			buffer[_size] = '\0';
 
@@ -235,7 +270,9 @@ namespace mst
 		{
 			size_t srcLen = str.length();
 			size_t newLen = length() + srcLen;
-			reserve(newLen + (newLen >> 1));
+
+			if (capacity() < newLen + 1)
+				reserve(newLen + (newLen >> 1));
 
 			char_t* buffer = data();
 			traits_t::copy(&buffer[_size], str.c_str(), srcLen);

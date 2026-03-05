@@ -244,6 +244,24 @@ void mst::string_test()
         std::wcout << wstr << std::endl;
         std::wcout << L"cap: " << wstr.capacity() << std::endl;
     }
+
+    //operator+
+    {
+        mst::string world(" world");
+        mst::string str = "hello" + world;
+
+        mst::string goodbye("goodbye");
+        mst::string str2 = goodbye + " world";
+
+        mst::string nice("nice");
+        mst::string string(" string");
+        mst::string st3 = nice + string;
+
+        mst::string finalStr = str + " " + str2 + " " + st3;
+
+        std::cout << finalStr << std::endl;
+        std::cout << "cap :" << finalStr.capacity() << std::endl;
+    }
 }
 
 
