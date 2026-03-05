@@ -104,7 +104,6 @@ namespace mst
 			return out;
 		}
 		
-
 		~basic_string() 
 		{
 			delete_heap();
@@ -216,6 +215,22 @@ namespace mst
 			newStr[_size] = '\0';
 			_heap._str = newStr;
 			_heap._capacity = newCapacity;
+		}
+
+		basic_string& operator=(basic_string rhs) noexcept
+		{
+			swap(*this, rhs);
+			return *this;
+		}
+
+		char_t& operator[](size_t i) noexcept
+		{
+			return data()[i];
+		}
+
+		const char_t& operator[](size_t i) const noexcept
+		{
+			return data()[i];
 		}
 
 	private:

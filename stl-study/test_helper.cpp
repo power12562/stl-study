@@ -156,6 +156,7 @@ void mst::list_test()
 
 void mst::string_test()
 {
+    //stack 버퍼
     {
         mst::string str("hello");
         mst::wstring wstr(L"world!");
@@ -170,6 +171,7 @@ void mst::string_test()
         wstr.clear();
     }
 
+    //heap 버퍼
     {
         mst::string str("abcdefghijklmnopqrstuvwxyz");
         mst::wstring wstr(L"이건 긴 문자열 테스트를 위한 임시 텍스트 입니다.");
@@ -187,17 +189,34 @@ void mst::string_test()
         wstr.clear();
     }
 
+    //복사생성, 이동생성
+    {
+        mst::string cpySrc = "abcdefghijklmnopqrstuvwxyz";
+        mst::string cpyDst(cpySrc);
+
+        std::cout << "cpy src :" << cpySrc << "\n";
+        std::cout << "cpy dst :" << cpyDst << "\n";
+
+        mst::string moveDst(std::move(cpySrc));
+
+        std::cout << "cpy src :" << cpySrc << "\n";
+        std::cout << "move dst :"<< moveDst << "\n";
+    }
+
+    //복사대입, 이동대입
     {
         mst::wstring cpySrc = L"abcdefghijklmnopqrstuvwxyz";
-        mst::wstring cpyDst(cpySrc);
+        mst::wstring cpyDst;
+        cpyDst = cpySrc;
 
         std::wcout << L"cpy src :" << cpySrc << "\n";
         std::wcout << L"cpy dst :" << cpyDst << "\n";
 
-        mst::wstring moveDst(std::move(cpySrc));
+        mst::wstring moveDst;
+        moveDst = std::move(cpySrc);
 
         std::wcout << L"cpy src :" << cpySrc << "\n";
-        std::wcout << L"move dst :"<< moveDst << "\n";
+        std::wcout << L"move dst :" << moveDst << "\n";
     }
 }
 
