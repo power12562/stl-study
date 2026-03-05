@@ -271,6 +271,19 @@ namespace mst
 			return *this;
 		}
 
+		int compare(const char_t* rStr, size_t rLen) const
+		{
+			size_t len = length();
+			size_t minLen = rLen < len ? rLen : len;
+			int lenCompare = traits_t::compare(c_str(), rStr, minLen);
+			if (lenCompare != 0)
+				return lenCompare;
+			else
+				return static_cast<int>(len - rLen);
+		}
+
+
+
 		basic_string& operator=(basic_string rhs) noexcept
 		{
 			swap(*this, rhs);

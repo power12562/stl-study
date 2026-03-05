@@ -262,6 +262,12 @@ void mst::string_test()
         std::cout << finalStr << std::endl;
         std::cout << "cap :" << finalStr.capacity() << std::endl;
     }
+
+    //compare
+    {
+
+
+    }
 }
 
 
