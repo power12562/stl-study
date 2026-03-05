@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include <string.h>
 #include <cwchar>
+#include <iostream>
 #include "common/memory.h"
 
 namespace mst
@@ -92,6 +93,12 @@ namespace mst
 			using std::swap;
 			swap(lhs._stack._str, rhs._stack._str);
 			swap(lhs._size, rhs._size);
+		}
+
+		friend std::ostream& operator<<(std::ostream& out, const basic_string& str)
+		{
+			out.write(str.c_str(), str.length());
+			return out;
 		}
 
 		~basic_string() 

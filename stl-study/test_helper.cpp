@@ -186,5 +186,21 @@ void mst::string_test()
         str.clear();
         wstr.clear();
     }
+
+    {
+        mst::string cpySrc = "abcdefghijklmnopqrstuvwxyz";
+        mst::string cpyDst(cpySrc);
+
+        std::cout << "cpy src :" << cpySrc << "\n";
+        std::cout << "cpy dst :" << cpyDst << "\n";
+
+        mst::string moveDst(std::move(cpySrc));
+
+        std::cout << "cpy src :" << cpySrc << "\n";
+        std::cout << "move dst :"<< moveDst << "\n";
+
+    }
 }
+
+
 
