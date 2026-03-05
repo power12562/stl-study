@@ -271,18 +271,26 @@ namespace mst
 			return *this;
 		}
 
-		int compare(const char_t* rStr, size_t rLen) const
+		int compare(const basic_string& str) const
 		{
-			size_t len = length();
-			size_t minLen = rLen < len ? rLen : len;
-			int lenCompare = traits_t::compare(c_str(), rStr, minLen);
+			return compare(str.c_str(), str.length());
+		}
+
+		int compare(const char_t* str) const
+		{
+			return compare(str, traits_t::length(str));
+		}
+
+		int compare(const char_t* str, size_t len) const
+		{
+			size_t mylen = length();
+			size_t minLen = len < mylen ? len : mylen;
+			int lenCompare = traits_t::compare(c_str(), str, minLen);
 			if (lenCompare != 0)
 				return lenCompare;
 			else
-				return static_cast<int>(len - rLen);
+				return static_cast<int>(mylen - len);
 		}
-
-
 
 		basic_string& operator=(basic_string rhs) noexcept
 		{
