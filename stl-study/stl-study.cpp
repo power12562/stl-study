@@ -12,6 +12,7 @@ int main()
 {
     using namespace mst;
 
+    setlocale(LC_ALL, "");
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
     //vector_test();

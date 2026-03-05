@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <string.h>
 #include <cwchar>
 #include "common/memory.h"
@@ -89,10 +89,7 @@ namespace mst
 	public:
 		~basic_string() 
 		{
-			if (heap_flag())
-			{
-				delete_heap();
-			}
+			delete_heap();
 		}
 
 		basic_string()
@@ -115,15 +112,8 @@ namespace mst
 
 		void clear() noexcept
 		{
-			const char& heapFlag = heap_flag();
-			if (heapFlag == false)
-			{
-				_stack._str[0] = '\0';
-			}
-			else
-			{
-				_heap._str[0] = '\0';
-			}
+			char* str = data();
+			str[0] = '\0';
 			_size = 0;
 		}
 

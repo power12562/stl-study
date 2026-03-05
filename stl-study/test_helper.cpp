@@ -156,13 +156,35 @@ void mst::list_test()
 
 void mst::string_test()
 {
-    mst::string str("hello");
-    mst::wstring wstr(L"world!");
+    {
+        mst::string str("hello");
+        mst::wstring wstr(L"world!");
 
-    std::cout << str.data() << " ";
-    std::wcout << wstr.data() << L"\n";
+        std::cout << str.data() << " ";
+        std::wcout << wstr.data() << L"\n";
 
-    std::cout << "str cap :" << str.capacity() << "\n";
-    std::cout << "wstr cap :" << wstr.capacity() << "\n";
+        std::cout << "str cap :" << str.capacity() << "\n";
+        std::cout << "wstr cap :" << wstr.capacity() << "\n";
+
+        str.clear();
+        wstr.clear();
+    }
+
+    {
+        mst::string str("abcdefghijklmnopqrstuvwxyz");
+        mst::wstring wstr(L"이건 긴 문자열 테스트를 위한 임시 텍스트 입니다.");
+
+        std::cout << str.data() << "\n";
+        std::wcout << wstr.data() << L"\n";
+
+        str.reserve(100);
+        wstr.reserve(100);
+
+        std::cout << "str cap :" << str.capacity() << "\n";
+        std::cout << "wstr cap :" << wstr.capacity() << "\n";
+
+        str.clear();
+        wstr.clear();
+    }
 }
 
