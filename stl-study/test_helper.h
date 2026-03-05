@@ -4,7 +4,8 @@
 #include "vector/vector_test.hpp"
 
 #include "list/study_list.hpp"
-#include "list/list_test.h"
+
+#include "string/study_string.hpp"
 
 struct VirtualBase
 {
@@ -50,4 +51,5 @@ namespace mst
 {
     void vector_test();
     void list_test();
+    void string_test();
 }

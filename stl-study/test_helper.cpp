@@ -153,3 +153,11 @@ void mst::list_test()
         std::cout << std::endl;
     } 
 }
+
+void mst::string_test()
+{
+    mst::string str;
+    mst::wstring wstr;
+
+}
+
