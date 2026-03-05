@@ -265,8 +265,14 @@ void mst::string_test()
 
     //compare
     {
+        mst::string world("world");
+       
+        std::cout << world.compare("worlds") << std::endl;
+        std::cout << world.compare("world") << std::endl;
+        std::cout << world.compare("worl") << std::endl;
 
-
+        std::cout << world.compare("aaaaa") << std::endl;
+        std::cout << world.compare("xxxxx") << std::endl;
     }
 }
 
