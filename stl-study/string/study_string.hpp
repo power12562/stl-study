@@ -132,6 +132,47 @@ namespace mst
 			temp.append(rhs);
 			return temp;
 		}
+
+		friend bool operator==(const basic_string& lhs, const basic_string& rhs)
+		{
+			if (lhs.length() != rhs.length())
+				return false;
+
+			return lhs.compare(rhs) == 0;
+		}
+
+		friend bool operator==(const char_t* lhs, const basic_string& rhs)
+		{
+			size_t lhsLen = traits_t::length(lhs);
+			if (lhsLen != rhs.length())
+				return false;
+
+			return rhs.compare(lhs, lhsLen) == 0;
+		}
+
+		friend bool operator==(const basic_string& lhs, const char_t* rhs)
+		{
+			size_t rhsLen = traits_t::length(rhs);
+			if (rhsLen != lhs.length())
+				return false;
+
+			return lhs.compare(rhs, rhsLen) == 0;
+		}
+
+		friend bool operator!=(const basic_string& lhs, const basic_string& rhs)
+		{
+			return !(lhs == rhs);
+		}
+
+		friend bool operator!=(const char_t* lhs, const basic_string& rhs)
+		{
+			return !(lhs == rhs);
+		}
+
+		friend bool operator!=(const basic_string& lhs, const char_t* rhs)
+		{
+			return !(lhs == rhs);
+		}
 		
 		~basic_string() 
 		{

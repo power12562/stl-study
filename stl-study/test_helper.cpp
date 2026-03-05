@@ -273,6 +273,12 @@ void mst::string_test()
 
         std::cout << world.compare("aaaaa") << std::endl;
         std::cout << world.compare("xxxxx") << std::endl;
+
+        std::cout << (world == "world" ? "same" : "different") << std::endl;
+        std::cout << (world != "worlds" ? "different" : "same") << std::endl;
+
+        std::cout << (world == "worl" ? "same" : "different") << std::endl;
+        std::cout << (world != "aaaaa" ? "different" : "same") << std::endl;
     }
 }
 
