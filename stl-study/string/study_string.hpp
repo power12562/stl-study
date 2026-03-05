@@ -87,6 +87,13 @@ namespace mst
 		};
 
 	public:
+		friend void swap(basic_string& lhs, basic_string& rhs)
+		{
+			using std::swap;
+			swap(lhs._stack._str, rhs._stack._str);
+			swap(lhs._size, rhs._size);
+		}
+
 		~basic_string() 
 		{
 			delete_heap();
@@ -109,6 +116,12 @@ namespace mst
 			reset_stack();
 			size_t len = rhs.length();
 			cpy_mem(rhs.c_str(), len);
+		}
+
+		basic_string(basic_string&& rhs) noexcept
+		{
+			reset_stack();
+			swap(*this, rhs);
 		}
 
 		size_t size() const noexcept { return _size; }
