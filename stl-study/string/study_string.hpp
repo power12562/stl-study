@@ -251,6 +251,11 @@ namespace mst
 			return append(str, traits_t::length(str));
 		}
 
+		basic_string& append(const basic_string& str)
+		{
+			return append(str.c_str(), str.length());
+		}
+
 		basic_string& append(const char_t* str, size_t len)
 		{
 			size_t newLen = length() + len;
@@ -260,22 +265,6 @@ namespace mst
 
 			char_t* buffer = data();
 			traits_t::copy(&buffer[_size], str, len);
-			_size = newLen;
-			buffer[_size] = '\0';
-
-			return *this;
-		}
-
-		basic_string& append(const basic_string& str)
-		{
-			size_t srcLen = str.length();
-			size_t newLen = length() + srcLen;
-
-			if (capacity() < newLen + 1)
-				reserve(newLen + (newLen >> 1));
-
-			char_t* buffer = data();
-			traits_t::copy(&buffer[_size], str.c_str(), srcLen);
 			_size = newLen;
 			buffer[_size] = '\0';
 
