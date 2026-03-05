@@ -333,6 +333,30 @@ namespace mst
 				return static_cast<int>(mylen - len);
 		}
 
+		char_t& at(size_t i)
+		{
+			if (i < length())
+			{
+				return operator[](i);
+			}
+			else
+			{
+				throw std::out_of_range("out of range");
+			}
+		}
+
+		const char_t& at(size_t i) const
+		{
+			if (i < length())
+			{
+				return operator[](i);
+			}
+			else
+			{
+				throw std::out_of_range("out of range");
+			}
+		}
+
 		basic_string& operator=(basic_string rhs) noexcept
 		{
 			swap(*this, rhs);
