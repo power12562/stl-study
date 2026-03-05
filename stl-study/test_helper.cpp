@@ -218,6 +218,32 @@ void mst::string_test()
         std::wcout << L"cpy src :" << cpySrc << "\n";
         std::wcout << L"move dst :" << moveDst << "\n";
     }
+
+    //인덱스 수정
+    {
+        mst::string hello = "h_ll_";
+        std::cout << hello << std::endl;
+        hello[1] = 'e';
+        hello[4] = 'o';
+        std::cout << hello << std::endl;
+    }
+
+    //append
+    {
+        mst::wstring wstr = L"hello world";
+        wstr.append(L" goodbye");
+        wstr.append(mst::wstring(L" world"));
+
+        std::wcout << wstr << std::endl;
+        std::wcout << L"cap: " << wstr.capacity() << std::endl;
+
+        wstr.clear();
+        wstr += L"goodbye";
+        wstr += mst::wstring(L" kim");
+
+        std::wcout << wstr << std::endl;
+        std::wcout << L"cap: " << wstr.capacity() << std::endl;
+    }
 }
 
 

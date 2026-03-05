@@ -217,6 +217,34 @@ namespace mst
 			_heap._capacity = newCapacity;
 		}
 
+		basic_string& append(const char_t* str)
+		{
+			size_t srcLen = traits_t::length(str);
+			size_t newLen = length() + srcLen;
+			reserve(newLen + (newLen >> 1));
+
+			char_t* buffer = data();
+			traits_t::copy(&buffer[_size], str, srcLen);
+			_size = newLen;
+			buffer[_size] = '\0';
+
+			return *this;
+		}
+
+		basic_string& append(const basic_string& str)
+		{
+			size_t srcLen = str.length();
+			size_t newLen = length() + srcLen;
+			reserve(newLen + (newLen >> 1));
+
+			char_t* buffer = data();
+			traits_t::copy(&buffer[_size], str.c_str(), srcLen);
+			_size = newLen;
+			buffer[_size] = '\0';
+
+			return *this;
+		}
+
 		basic_string& operator=(basic_string rhs) noexcept
 		{
 			swap(*this, rhs);
@@ -231,6 +259,16 @@ namespace mst
 		const char_t& operator[](size_t i) const noexcept
 		{
 			return data()[i];
+		}
+
+		basic_string& operator+=(const basic_string& rhs)
+		{
+			return append(rhs);
+		}
+
+		basic_string& operator+=(const char_t* rhs)
+		{
+			return append(rhs);
 		}
 
 	private:
@@ -281,15 +319,14 @@ namespace mst
 			{
 				traits_t::copy(_stack._str, src, count);
 				_stack._str[count] = '\0';
-				_size = count;
 			}
 			else
 			{
 				reserve(count);
 				traits_t::copy(_heap._str, src, count);
 				_heap._str[count] = '\0';
-				_size = count;
 			}
+			_size = count;
 		}
 
 		static constexpr size_t align_up(size_t n) noexcept
