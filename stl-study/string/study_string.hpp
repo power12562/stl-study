@@ -104,6 +104,13 @@ namespace mst
 			cpy_mem(str, len);
 		}
 
+		basic_string(const basic_string& rhs)
+		{
+			reset_stack();
+			size_t len = rhs.length();
+			cpy_mem(rhs.c_str(), len);
+		}
+
 		size_t size() const noexcept { return _size; }
 
 		size_t length() const noexcept { return _size; }
@@ -151,6 +158,11 @@ namespace mst
 			{
 				return _heap._str;
 			}
+		}
+
+		const char* c_str() const noexcept
+		{
+			return data();
 		}
 
 		void reserve(size_t count)
