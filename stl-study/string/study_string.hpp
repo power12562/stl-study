@@ -104,14 +104,7 @@ namespace mst
 		{
 			reset_stack();
 			size_t len = traits_t::length(str);
-			if(is_stack_len(len))
-			{
-				cpy_stack(str, len);
-			}
-			else
-			{ 
-
-			}			
+			cpy_mem(str, len);
 		}
 
 		size_t size() const noexcept { return _size; }
@@ -119,6 +112,20 @@ namespace mst
 		size_t length() const noexcept { return _size; }
 
 		bool empty() const noexcept { return 0 == size(); }
+
+		void clear() noexcept
+		{
+			const char& heapFlag = heap_flag();
+			if (heapFlag == false)
+			{
+				_stack._str[0] = '\0';
+			}
+			else
+			{
+				_heap._str[0] = '\0';
+			}
+			_size = 0;
+		}
 
 		size_t capacity() const noexcept
 		{
@@ -161,7 +168,7 @@ namespace mst
 			if (count < capacity())
 				return;
 
-			size_t newCapacity = align_up(count);
+			size_t newCapacity = align_up(count + 1);
 			char_t* newStr = new char_t[newCapacity];
 			char& heapFlag = heap_flag();
 			if (heapFlag == false)
@@ -227,11 +234,21 @@ namespace mst
 			return len < STACK_MAX_LEN;
 		}
 
-		void cpy_stack(const char_t* src, size_t count)
+		void cpy_mem(const char_t* src, size_t count)
 		{
-			traits_t::copy(_stack._str, src, count);
-			_stack._str[count] = '\0';
-			_size = count;
+			if (is_stack_len(count))
+			{
+				traits_t::copy(_stack._str, src, count);
+				_stack._str[count] = '\0';
+				_size = count;
+			}
+			else
+			{
+				reserve(count);
+				traits_t::copy(_heap._str, src, count);
+				_heap._str[count] = '\0';
+				_size = count;
+			}
 		}
 
 		static constexpr size_t align_up(size_t n) noexcept
