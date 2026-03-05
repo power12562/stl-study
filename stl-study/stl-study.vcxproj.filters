@@ -35,10 +35,10 @@
     <ClInclude Include="list\study_list.hpp">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="list\list_test.h">
+    <ClInclude Include="test_helper.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="test_helper.h">
+    <ClInclude Include="string\study_string.hpp">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
