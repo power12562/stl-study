@@ -112,7 +112,7 @@ namespace mst
 
 		void clear() noexcept
 		{
-			char* str = data();
+			char_t* str = data();
 			str[0] = '\0';
 			_size = 0;
 		}
