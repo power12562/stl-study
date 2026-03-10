@@ -9,20 +9,27 @@ namespace mst
 	template <typename T>
 	class vector
 	{
-		using element_type = T;
+		using value_type = T;
 		using container_type = vector<T>;
 		static constexpr size_t max_capacity = std::numeric_limits<size_t>::max();
 	public:
+
 		template <bool CONST_ITER>
 		class iterator_template
 		{
-			using iter_element_type = std::conditional_t<CONST_ITER, const element_type, element_type>;
+			using iter_element_type = std::conditional_t<CONST_ITER, const value_type, value_type>;
 			using iter_type = iterator_template<CONST_ITER>;
 			using iterator = iterator_template<false>;
 			using const_iterator = iterator_template<true>;
 			friend class container_type;
 			template <bool> friend class iterator_template;
 		public:
+			using iterator_category = std::random_access_iterator_tag;
+			using value_type = T;
+			using difference_type = std::ptrdiff_t;
+			using pointer = iter_element_type*;
+			using reference = iter_element_type&;
+
 			iterator_template() = default;
 			iterator_template(iter_element_type* elementPointer) : _currentPointer(elementPointer) {}
 			~iterator_template() noexcept = default;
@@ -45,23 +52,41 @@ namespace mst
 				return _currentPointer[index];
 			}
 
+			iter_type& operator+=(size_t offset)
+			{
+				_currentPointer += offset;
+				return *this;
+			}
+
 			iter_type operator+(size_t offset) const
 			{
 				iter_element_type* newOffset = _currentPointer + offset;
 				return iter_type(newOffset);
 			}
 
+			friend iter_type operator+(size_t offset, const iter_type& rhs)
+			{
+				iter_element_type* newOffset = rhs.operator+(offset);
+				return iter_type(newOffset);
+			}
+
 			iter_type operator++() 
 			{
-				_currentPointer += 1;
+				++_currentPointer;
 				return *this;
 			}
 
 			iter_type operator++(int) 
 			{
 				iter_type temp = *this;
-				_currentPointer += 1;
+				++_currentPointer;
 				return temp;
+			}
+
+			iter_type& operator-=(size_t offset)
+			{
+				_currentPointer -= offset;
+				return *this;
 			}
 
 			iter_type operator-(size_t offset) const
@@ -70,27 +95,39 @@ namespace mst
 				return iter_type(newOffset);
 			}
 
-			std::ptrdiff_t operator-(iter_type rhs) const
+			friend iter_type operator-(size_t offset, const iter_type& rhs)
+			{
+				iter_element_type* newOffset = rhs.operator-(offset);
+				return iter_type(newOffset);
+			}
+
+			template<bool rhsConst> 
+			difference_type operator-(const iterator_template<rhsConst>& rhs) const
 			{
 				return _currentPointer - rhs._currentPointer;
 			}
 
 			iter_type operator--()
 			{
-				_currentPointer -= 1;
+				--_currentPointer;
 				return *this;
 			}
 
 			iter_type operator--(int)
 			{
 				iter_type temp = *this;
-				_currentPointer -= 1;
+				--_currentPointer;
 				return temp;
 			}
 
 			template <bool rhsConst> bool operator==(const iterator_template<rhsConst>& rhs) const
 			{
 				return _currentPointer == rhs._currentPointer;
+			}
+
+			template <bool rhsConst> bool operator!=(const iterator_template<rhsConst>& rhs) const
+			{
+				return !(_currentPointer == rhs._currentPointer);
 			}
 
 			template <bool rhsConst> bool operator<(const iterator_template<rhsConst>& rhs) const
@@ -155,9 +192,9 @@ namespace mst
 						reserve(newSize);
 					}
 
-					if constexpr (std::is_trivially_copyable_v<element_type>)
+					if constexpr (std::is_trivially_copyable_v<value_type>)
 					{
-						std::memset(&_memory[prevSize], 0, sizeof(element_type) * (newSize - prevSize));
+						std::memset(&_memory[prevSize], 0, sizeof(value_type) * (newSize - prevSize));
 					}
 					else
 					{
@@ -169,7 +206,7 @@ namespace mst
 				}
 				else
 				{
-					if constexpr (std::is_trivially_copyable_v<element_type> == false)
+					if constexpr (std::is_trivially_copyable_v<value_type> == false)
 					{
 						for (size_t i = newSize; i < prevSize; i++)
 						{
@@ -188,8 +225,8 @@ namespace mst
 				size_t size = _size;
 				size_t newCapacity = capacity;
 				size_t prevCapacity = _capacity;
-				element_type* prevMemory = _memory;
-				element_type* newMemory = NewMem(newCapacity);
+				value_type* prevMemory = _memory;
+				value_type* newMemory = NewMem(newCapacity);
 				SafeMove(newMemory, prevMemory, size);
 				SafeFree(prevMemory);
 
@@ -205,7 +242,7 @@ namespace mst
 
 		iterator end()
 		{
-			element_type* newOffset = _memory + _size;
+			value_type* newOffset = _memory + _size;
 			return iterator(newOffset);
 		}
 
@@ -216,7 +253,7 @@ namespace mst
 
 		const_iterator end() const
 		{
-			element_type* newOffset = _memory + _size;
+			value_type* newOffset = _memory + _size;
 			return const_iterator(newOffset);
 		}
 
@@ -227,16 +264,20 @@ namespace mst
 
 		const_iterator cend() const
 		{
-			element_type* newOffset = _memory + _size;
+			value_type* newOffset = _memory + _size;
 			return const_iterator(newOffset);
 		}
 
 		void clear() noexcept
 		{
-			FreeMem(_memory, _size);
-			_memory = nullptr;
+			if constexpr (std::is_trivially_copyable_v<value_type> == false)
+			{
+				for (size_t i = 0; i < size; i++)
+				{
+					std::destroy_at(&memory[i]);
+				}
+			}
 			_size = 0;
-			_capacity = 0;
 		}
 
 		template<typename VT>
@@ -272,11 +313,11 @@ namespace mst
 					reserve(newCapacity);
 				}
 
-				if constexpr (std::is_trivially_copyable_v<element_type>)
+				if constexpr (std::is_trivially_copyable_v<value_type>)
 				{
 					size_t dstStart = index + 1;
 					size_t cpyCount = lastIndex - index;
-					std::memmove(&_memory[dstStart], &_memory[index], sizeof(element_type) * cpyCount);
+					std::memmove(&_memory[dstStart], &_memory[index], sizeof(value_type) * cpyCount);
 				}
 				else
 				{
@@ -296,7 +337,7 @@ namespace mst
 			return begin() + index;
 		}
 
-		iterator insert(iterator pos, std::initializer_list<element_type> list)
+		iterator insert(iterator pos, std::initializer_list<value_type> list)
 		{
 			size_t index = pos - begin();
 			size_t listSize = list.size();
@@ -309,12 +350,12 @@ namespace mst
 
 			if (0 < size())
 			{		
-				if constexpr (std::is_trivially_copyable_v<element_type>)
+				if constexpr (std::is_trivially_copyable_v<value_type>)
 				{
 					size_t dstIndex = index + listSize;
 					size_t cpyCount = size() - index;
-					std::memmove(&_memory[dstIndex], &_memory[index], sizeof(element_type) * cpyCount);
-					std::memcpy(&_memory[index], list.begin(), sizeof(element_type) * listSize);
+					std::memmove(&_memory[dstIndex], &_memory[index], sizeof(value_type) * cpyCount);
+					std::memcpy(&_memory[index], list.begin(), sizeof(value_type) * listSize);
 				}
 				else
 				{
@@ -343,9 +384,9 @@ namespace mst
 			}
 			else
 			{
-				if constexpr (std::is_trivially_copyable_v<element_type>)
+				if constexpr (std::is_trivially_copyable_v<value_type>)
 				{
-					std::memcpy(&_memory[0], list.begin(), sizeof(element_type) * listSize);
+					std::memcpy(&_memory[0], list.begin(), sizeof(value_type) * listSize);
 				}
 				else
 				{
@@ -365,11 +406,11 @@ namespace mst
 			size_t index = pos - begin();
 			size_t lastIndex = size() - 1;
 
-			if constexpr (std::is_trivially_copyable_v<element_type>)
+			if constexpr (std::is_trivially_copyable_v<value_type>)
 			{
 				size_t cpyStart = index + 1;
 				size_t cpyCount = size() - cpyStart;
-				std::memmove(&_memory[index], &_memory[cpyStart], sizeof(element_type) * cpyCount);
+				std::memmove(&_memory[index], &_memory[cpyStart], sizeof(value_type) * cpyCount);
 			}
 			else
 			{
@@ -384,12 +425,12 @@ namespace mst
 			return begin() + index;
 		}
 
-		element_type& operator[] (size_t index) noexcept
+		value_type& operator[] (size_t index) noexcept
 		{
 			return _memory[index];
 		}
 
-		const element_type& operator[] (size_t index) const noexcept
+		const value_type& operator[] (size_t index) const noexcept
 		{
 			return _memory[index];
 		}
@@ -408,7 +449,7 @@ namespace mst
 			}
 		}
 
-		vector(std::initializer_list<element_type> list)
+		vector(std::initializer_list<value_type> list)
 		{
 			size_t newSize = list.size();
 			if (0 < newSize)
@@ -424,9 +465,9 @@ namespace mst
 		vector(const container_type& rhs)
 		{
 			reserve(rhs.capacity());
-			if constexpr (std::is_trivially_copyable_v<element_type>)
+			if constexpr (std::is_trivially_copyable_v<value_type>)
 			{
-				std::memcpy(_memory, rhs._memory, sizeof(element_type) * rhs.size());
+				std::memcpy(_memory, rhs._memory, sizeof(value_type) * rhs.size());
 			}
 			else
 			{
@@ -446,11 +487,14 @@ namespace mst
 
 		~vector() noexcept
 		{
-			clear();
+			FreeMem(_memory, _size);
+			_memory = nullptr;
+			_size = 0;
+			_capacity = 0;
 		}
 
 	private:
-		element_type* _memory = nullptr;
+		value_type* _memory = nullptr;
 		size_t _size = 0;
 		size_t _capacity = 0;
 
@@ -470,18 +514,18 @@ namespace mst
 			return bitCapacity * 2;
 		}
 
-		static element_type* NewMem(size_t size)
+		static value_type* NewMem(size_t size)
 		{
 			if (0 < size)
 			{
-				size_t mallocSize = sizeof(element_type) * size;
+				size_t mallocSize = sizeof(value_type) * size;
 				void* mem = malloc(mallocSize);
-				return static_cast<element_type*>(mem);
+				return static_cast<value_type*>(mem);
 			}	
 			return nullptr;
 		}
 
-		static void FreeMem(element_type* memory, size_t size)
+		static void FreeMem(value_type* memory, size_t size)
 		{
 			for (size_t i = 0; i < size; i++)
 			{
