@@ -31,36 +31,36 @@ namespace mst
 			using reference = iter_element_type&;
 
 			iterator_template() = default;
-			iterator_template(iter_element_type* elementPointer) : _currentPointer(elementPointer) {}
+			iterator_template(iter_element_type* elementPointer) : _pointer(elementPointer) {}
 			~iterator_template() noexcept = default;
 
 			template <bool rhsConst>
-			iterator_template(const iterator_template<rhsConst>& rhs) requires (CONST_ITER && !rhsConst) : _currentPointer(rhs._currentPointer) {}
+			iterator_template(const iterator_template<rhsConst>& rhs) requires (CONST_ITER && !rhsConst) : _pointer(rhs._pointer) {}
 
 			iter_element_type& operator*() const noexcept 
 			{
-				return *_currentPointer;
+				return *_pointer;
 			}
 
 			iter_element_type* operator->() const noexcept
 			{
-				return _currentPointer;
+				return _pointer;
 			}
 
 			iter_element_type& operator[](size_t index) const noexcept
 			{
-				return _currentPointer[index];
+				return _pointer[index];
 			}
 
 			iter_type& operator+=(size_t offset)
 			{
-				_currentPointer += offset;
+				_pointer += offset;
 				return *this;
 			}
 
 			iter_type operator+(size_t offset) const
 			{
-				iter_element_type* newOffset = _currentPointer + offset;
+				iter_element_type* newOffset = _pointer + offset;
 				return iter_type(newOffset);
 			}
 
@@ -72,26 +72,26 @@ namespace mst
 
 			iter_type operator++() 
 			{
-				++_currentPointer;
+				++_pointer;
 				return *this;
 			}
 
 			iter_type operator++(int) 
 			{
 				iter_type temp = *this;
-				++_currentPointer;
+				++_pointer;
 				return temp;
 			}
 
 			iter_type& operator-=(size_t offset)
 			{
-				_currentPointer -= offset;
+				_pointer -= offset;
 				return *this;
 			}
 
 			iter_type operator-(size_t offset) const
 			{
-				iter_element_type* newOffset = _currentPointer - offset;
+				iter_element_type* newOffset = _pointer - offset;
 				return iter_type(newOffset);
 			}
 
@@ -104,54 +104,54 @@ namespace mst
 			template<bool rhsConst> 
 			difference_type operator-(const iterator_template<rhsConst>& rhs) const
 			{
-				return _currentPointer - rhs._currentPointer;
+				return _pointer - rhs._pointer;
 			}
 
 			iter_type operator--()
 			{
-				--_currentPointer;
+				--_pointer;
 				return *this;
 			}
 
 			iter_type operator--(int)
 			{
 				iter_type temp = *this;
-				--_currentPointer;
+				--_pointer;
 				return temp;
 			}
 
 			template <bool rhsConst> bool operator==(const iterator_template<rhsConst>& rhs) const
 			{
-				return _currentPointer == rhs._currentPointer;
+				return _pointer == rhs._pointer;
 			}
 
 			template <bool rhsConst> bool operator!=(const iterator_template<rhsConst>& rhs) const
 			{
-				return !(_currentPointer == rhs._currentPointer);
+				return !(_pointer == rhs._pointer);
 			}
 
 			template <bool rhsConst> bool operator<(const iterator_template<rhsConst>& rhs) const
 			{
-				return _currentPointer < rhs._currentPointer;
+				return _pointer < rhs._pointer;
 			}
 
 			template <bool rhsConst> bool operator<=(const iterator_template<rhsConst>& rhs) const
 			{
-				return _currentPointer <= rhs._currentPointer;
+				return _pointer <= rhs._pointer;
 			}
 
 			template <bool rhsConst> bool operator>(const iterator_template<rhsConst>& rhs) const
 			{
-				return _currentPointer > rhs._currentPointer;
+				return _pointer > rhs._pointer;
 			}
 
 			template <bool rhsConst> bool operator>=(const iterator_template<rhsConst>& rhs) const
 			{
-				return _currentPointer >= rhs._currentPointer;
+				return _pointer >= rhs._pointer;
 			}
 
 		private:
-			iter_element_type* _currentPointer = nullptr;
+			iter_element_type* _pointer = nullptr;
 		};
 		using iterator = iterator_template<false>;
 		using const_iterator = iterator_template<true>;
