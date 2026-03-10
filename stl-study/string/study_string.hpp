@@ -133,7 +133,7 @@ namespace mst
 			return temp;
 		}
 
-		friend bool operator==(const basic_string& lhs, const basic_string& rhs)
+		friend bool operator==(const basic_string& lhs, const basic_string& rhs) noexcept
 		{
 			if (lhs.length() != rhs.length())
 				return false;
@@ -141,7 +141,7 @@ namespace mst
 			return lhs.compare(rhs) == 0;
 		}
 
-		friend bool operator==(const char_t* lhs, const basic_string& rhs)
+		friend bool operator==(const char_t* lhs, const basic_string& rhs) noexcept
 		{
 			size_t lhsLen = traits_t::length(lhs);
 			if (lhsLen != rhs.length())
@@ -150,7 +150,7 @@ namespace mst
 			return rhs.compare(lhs, lhsLen) == 0;
 		}
 
-		friend bool operator==(const basic_string& lhs, const char_t* rhs)
+		friend bool operator==(const basic_string& lhs, const char_t* rhs) noexcept
 		{
 			size_t rhsLen = traits_t::length(rhs);
 			if (rhsLen != lhs.length())
@@ -159,19 +159,79 @@ namespace mst
 			return lhs.compare(rhs, rhsLen) == 0;
 		}
 
-		friend bool operator!=(const basic_string& lhs, const basic_string& rhs)
+		friend bool operator!=(const basic_string& lhs, const basic_string& rhs) noexcept
 		{
 			return !(lhs == rhs);
 		}
 
-		friend bool operator!=(const char_t* lhs, const basic_string& rhs)
+		friend bool operator!=(const char_t* lhs, const basic_string& rhs) noexcept
 		{
 			return !(lhs == rhs);
 		}
 
-		friend bool operator!=(const basic_string& lhs, const char_t* rhs)
+		friend bool operator!=(const basic_string& lhs, const char_t* rhs) noexcept
 		{
 			return !(lhs == rhs);
+		}
+
+		friend bool operator<(const basic_string& lhs, const basic_string& rhs) noexcept
+		{
+			return lhs.compare(rhs) < 0;
+		}
+
+		friend bool operator<(const basic_string& lhs, const char_t* rhs) noexcept
+		{
+			return lhs.compare(rhs) < 0;
+		}
+
+		friend bool operator<(const char_t* lhs, const basic_string& rhs) noexcept
+		{
+			return rhs.compare(lhs) > 0;
+		}
+
+		friend bool operator<=(const basic_string& lhs, const basic_string& rhs) noexcept
+		{
+			return lhs.compare(rhs) <= 0;
+		}
+
+		friend bool operator<=(const basic_string& lhs, const char_t* rhs) noexcept
+		{
+			return lhs.compare(rhs) <= 0;
+		}
+
+		friend bool operator<=(const char_t* lhs, const basic_string& rhs) noexcept
+		{
+			return rhs.compare(lhs) >= 0;
+		}
+
+		friend bool operator>(const basic_string& lhs, const basic_string& rhs) noexcept
+		{
+			return lhs.compare(rhs) > 0;
+		}
+
+		friend bool operator>(const basic_string& lhs, const char_t* rhs) noexcept
+		{
+			return lhs.compare(rhs) > 0;
+		}
+
+		friend bool operator>(const char_t* lhs, const basic_string& rhs) noexcept
+		{
+			return rhs.compare(lhs) < 0;
+		}
+
+		friend bool operator>=(const basic_string& lhs, const basic_string& rhs) noexcept
+		{
+			return lhs.compare(rhs) >= 0;
+		}
+
+		friend bool operator>=(const basic_string& lhs, const char_t* rhs) noexcept
+		{
+			return lhs.compare(rhs) >= 0;
+		}
+
+		friend bool operator>=(const char_t* lhs, const basic_string& rhs) noexcept
+		{
+			return rhs.compare(lhs) <= 0;
 		}
 		
 		~basic_string() 
