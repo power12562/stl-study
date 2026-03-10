@@ -272,9 +272,9 @@ namespace mst
 		{
 			if constexpr (std::is_trivially_copyable_v<value_type> == false)
 			{
-				for (size_t i = 0; i < size; i++)
+				for (size_t i = 0; i < size(); i++)
 				{
-					std::destroy_at(&memory[i]);
+					std::destroy_at(&_memory[i]);
 				}
 			}
 			_size = 0;
