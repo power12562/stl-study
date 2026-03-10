@@ -34,6 +34,12 @@ namespace mst
 			friend class container_type;
 
 		public:
+			using iterator_category = std::bidirectional_iterator_tag;
+			using value_type = element_type;
+			using difference_type = std::ptrdiff_t;
+			using pointer	 = iter_element_type*;
+			using reference	 = iter_element_type&;
+
 			iterator_template() = default;
 			iterator_template(iter_node_dummy_type* nd) : _currentNode(nd) {}
 			~iterator_template() = default;
@@ -95,6 +101,11 @@ namespace mst
 			template <bool rhsConst> bool operator==(const iterator_template<rhsConst>& rhs) const
 			{
 				return _currentNode == rhs._currentNode;
+			}
+
+			template <bool rhsConst> bool operator!=(const iterator_template<rhsConst>& rhs) const
+			{
+				return !(_currentNode == rhs._currentNode);
 			}
 
 		private:
@@ -191,8 +202,6 @@ namespace mst
 
 		iterator insert(iterator pos, const element_type& value)
 		{
-			if (pos._currentNode == nullptr) throw std::runtime_error("Invalid iterator.");
-
 			node* newNode = new node(value);
 			dummy_node* rightNode = pos._currentNode;
 			dummy_node* leftNode = rightNode->_prev;
