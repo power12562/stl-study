@@ -1,4 +1,5 @@
 ﻿#include "test_helper.h"
+#include <algorithm>
 
 void mst::vector_test()
 {
@@ -279,6 +280,34 @@ void mst::string_test()
 
         std::cout << (world == "worl" ? "same" : "different") << std::endl;
         std::cout << (world != "aaaaa" ? "different" : "same") << std::endl;
+    }
+
+    //iter
+    {
+        char abc[] = "abcdefghijkl";
+        auto rabc = ++std::rbegin(abc);
+        mst::string str("hello world!");
+        for (auto iter = str.begin(); iter != str.end(); ++iter)
+        {
+            std::cout << *iter;
+            size_t i = iter - str.begin();
+            *iter = rabc[i];
+        }
+        std::cout << '\n';
+
+        const mst::string& cstr = str;
+        for (auto& c : cstr)
+        {
+            std::cout << c;
+        }
+        std::cout << '\n';
+
+        std::sort(str.begin(), str.end());
+        for (auto& c : cstr)
+        {
+            std::cout << c;
+        }
+        std::cout << '\n';
     }
 }
 

@@ -234,6 +234,149 @@ namespace mst
 			return rhs.compare(lhs) <= 0;
 		}
 		
+		template <bool CONST_ITER>
+		class iterator_template
+		{
+			using iter_char_type = std::conditional_t<CONST_ITER, const char_t, char_t>;
+			using iter_type = iterator_template<CONST_ITER>;
+			using iterator = iterator_template<false>;
+			using const_iterator = iterator_template<true>;
+			friend class container_type;
+			template <bool> friend class iterator_template;
+
+		public:
+			using iterator_category = std::random_access_iterator_tag;
+			using value_type = char_t;
+			using difference_type = std::ptrdiff_t;
+			using pointer = iter_char_type*;
+			using reference = iter_char_type&;
+
+			iterator_template() = default;
+			iterator_template(iter_char_type* elementPointer) : _pointer(elementPointer) {}
+			~iterator_template() noexcept = default;
+
+			template <bool rhsConst>
+			iterator_template(const iterator_template<rhsConst>& rhs) requires (CONST_ITER && !rhsConst) : _pointer(rhs._pointer) {}
+
+			iter_char_type& operator*() const noexcept
+			{
+				return *_pointer;
+			}
+
+			iter_char_type* operator->() const noexcept
+			{
+				return _pointer;
+			}
+
+			iter_char_type& operator[](size_t index) const noexcept
+			{
+				return _pointer[index];
+			}
+
+			iter_type& operator+=(size_t offset)
+			{
+				_pointer += offset;
+				return *this;
+			}
+
+			iter_type operator+(size_t offset) const
+			{
+				iter_char_type* newOffset = _pointer + offset;
+				return iter_type(newOffset);
+			}
+
+			friend iter_type operator+(size_t offset, const iter_type& rhs)
+			{
+				iter_char_type* newOffset = rhs.operator+(offset);
+				return iter_type(newOffset);
+			}
+
+			iter_type operator++()
+			{
+				++_pointer;
+				return *this;
+			}
+
+			iter_type operator++(int)
+			{
+				iter_type temp = *this;
+				++_pointer;
+				return temp;
+			}
+
+			iter_type& operator-=(size_t offset)
+			{
+				_pointer -= offset;
+				return *this;
+			}
+
+			iter_type operator-(size_t offset) const
+			{
+				iter_char_type* newOffset = _pointer - offset;
+				return iter_type(newOffset);
+			}
+
+			friend iter_type operator-(size_t offset, const iter_type& rhs)
+			{
+				iter_char_type* newOffset = rhs.operator-(offset);
+				return iter_type(newOffset);
+			}
+
+			template<bool rhsConst>
+			difference_type operator-(const iterator_template<rhsConst>& rhs) const
+			{
+				return _pointer - rhs._pointer;
+			}
+
+			iter_type operator--()
+			{
+				--_pointer;
+				return *this;
+			}
+
+			iter_type operator--(int)
+			{
+				iter_type temp = *this;
+				--_pointer;
+				return temp;
+			}
+
+			template <bool rhsConst> bool operator==(const iterator_template<rhsConst>& rhs) const
+			{
+				return _pointer == rhs._pointer;
+			}
+
+			template <bool rhsConst> bool operator!=(const iterator_template<rhsConst>& rhs) const
+			{
+				return !(_pointer == rhs._pointer);
+			}
+
+			template <bool rhsConst> bool operator<(const iterator_template<rhsConst>& rhs) const
+			{
+				return _pointer < rhs._pointer;
+			}
+
+			template <bool rhsConst> bool operator<=(const iterator_template<rhsConst>& rhs) const
+			{
+				return _pointer <= rhs._pointer;
+			}
+
+			template <bool rhsConst> bool operator>(const iterator_template<rhsConst>& rhs) const
+			{
+				return _pointer > rhs._pointer;
+			}
+
+			template <bool rhsConst> bool operator>=(const iterator_template<rhsConst>& rhs) const
+			{
+				return _pointer >= rhs._pointer;
+			}
+
+		private:
+			iter_char_type* _pointer = nullptr;
+		};
+		using iterator = iterator_template<false>;
+		using const_iterator = iterator_template<true>;
+
 		~basic_string() 
 		{
 			delete_heap();
@@ -269,6 +412,37 @@ namespace mst
 		size_t length() const noexcept { return _size; }
 
 		bool empty() const noexcept { return 0 == size(); }
+
+		iterator begin()
+		{
+			return iterator(data());
+		}
+
+		iterator end()
+		{
+			return iterator(data() + length());
+		}
+
+		const_iterator begin() const
+		{
+			return cbegin();
+		}
+
+		const_iterator end() const
+		{
+			return cend();
+		}
+
+		const_iterator cbegin() const
+		{
+			return const_iterator(data());
+		}
+
+		const_iterator cend() const
+		{
+			return const_iterator(data() + length());
+		}
+
 
 		void clear() noexcept
 		{
