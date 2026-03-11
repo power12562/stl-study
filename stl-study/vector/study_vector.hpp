@@ -659,7 +659,7 @@ namespace mst
 			{
 				if constexpr (std::is_trivially_copyable_v<value_type>)
 				{
-					std::memcpy(_memory, rhs._memory, sizeof(value_type) * rhs.size());
+					std::memcpy(_memory, rhs._memory, sizeof(value_type) * rhsSize);
 				}
 				else
 				{
