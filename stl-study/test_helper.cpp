@@ -98,6 +98,7 @@ void mst::vector_test()
             std::cout << *ptr << ", ";
         }
         std::cout << std::endl;
+
     }
 
     std::cout << std::endl;
@@ -363,6 +364,13 @@ void mst::string_test()
         std::cout << '\n';
 
         std::sort(str.begin(), str.end());
+        for (auto& c : cstr)
+        {
+            std::cout << c;
+        }
+        std::cout << '\n';
+
+        std::sort(str.rbegin(), str.rend());
         for (auto& c : cstr)
         {
             std::cout << c;

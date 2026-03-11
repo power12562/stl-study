@@ -76,6 +76,7 @@ namespace mst
 		using char_t = _char_t;
 		using traits_t = _traits_t;
 		using ostream_t = std::conditional_t<std::is_same_v<char, char_t>, std::ostream, std::wostream>;
+		using container_type = basic_string;
 
 		static constexpr size_t STACK_BUF_SIZE  = 32;
 		static constexpr size_t STACK_BUF_COUNT = STACK_BUF_SIZE / sizeof(char_t);
@@ -377,6 +378,165 @@ namespace mst
 		using iterator = iterator_template<false>;
 		using const_iterator = iterator_template<true>;
 
+		template <bool CONST_ITER>
+		class reverse_iterator_template
+		{
+			using iter_char_type = std::conditional_t<CONST_ITER, const char_t, char_t>;
+			using iter_type = iterator_template<CONST_ITER>;
+			using reverse_iter_type = reverse_iterator_template<CONST_ITER>;
+			using reverse_iterator = reverse_iterator_template<false>;
+			using const_reverse_iterator = reverse_iterator_template<true>;
+			friend class container_type;
+			template <bool> friend class reverse_iterator_template;
+
+		public:
+			using iterator_category = std::random_access_iterator_tag;
+			using value_type = char_t;
+			using difference_type = std::ptrdiff_t;
+			using pointer = iter_char_type*;
+			using reference = iter_char_type&;
+
+			reverse_iterator_template() = default;
+			reverse_iterator_template(pointer elementPointer) : _iterator(elementPointer) {}
+			~reverse_iterator_template() noexcept = default;
+
+			template <bool rhsConst>
+			reverse_iterator_template(const reverse_iterator_template<rhsConst>& rhs) requires (CONST_ITER && !rhsConst) : _iterator(rhs._iterator) {}
+
+			iter_type get_reverse_pos_iter() const
+			{
+				iter_type temp = _iterator;
+				--temp;
+				return temp;
+			}
+
+			reference operator*() const noexcept
+			{
+				return *get_reverse_pos_iter();
+			}
+
+			pointer operator->() const noexcept
+			{
+				iter_type temp = get_reverse_pos_iter();
+				pointer tempPointer = &(*temp);
+				return tempPointer;
+			}
+
+			reference operator[](size_t index) const noexcept
+			{
+				iter_type temp = get_reverse_pos_iter();
+				return temp[-index];
+			}
+
+			reverse_iter_type& operator+=(size_t offset)
+			{
+				_iterator -= offset;
+				return *this;
+			}
+
+			reverse_iter_type operator+(size_t offset) const
+			{
+				iter_type temp = _iterator - offset;
+				pointer tempPointer = &(*temp);
+				return reverse_iter_type(tempPointer);
+			}
+
+			friend reverse_iter_type operator+(size_t offset, const reverse_iter_type& rhs)
+			{
+				reverse_iter_type temp = rhs + offset;
+				return temp;
+			}
+
+			reverse_iter_type& operator++()
+			{
+				--_iterator;
+				return *this;
+			}
+
+			reverse_iter_type operator++(int)
+			{
+				iter_type temp = _iterator;
+				--_iterator;
+				pointer tempPointer = &(*temp);
+				return reverse_iter_type(tempPointer);
+			}
+
+			reverse_iter_type& operator-=(size_t offset)
+			{
+				_iterator += offset;
+				return *this;
+			}
+
+			reverse_iter_type operator-(size_t offset) const
+			{
+				iter_type temp = _iterator + offset;
+				pointer tempPointer = &(*temp);
+				return reverse_iter_type(tempPointer);
+			}
+
+			friend reverse_iter_type operator-(size_t offset, const reverse_iter_type& rhs)
+			{
+				reverse_iter_type temp = rhs - offset;
+				return temp;
+			}
+
+			template<bool rhsConst>
+			difference_type operator-(const reverse_iterator_template<rhsConst>& rhs) const
+			{
+				return rhs._iterator - _iterator;
+			}
+
+			reverse_iter_type& operator--()
+			{
+				++_iterator;
+				return *this;
+			}
+
+			reverse_iter_type operator--(int)
+			{
+				iter_type temp = _iterator;
+				++_iterator;
+				pointer tempPointer = &(*temp);
+				return reverse_iter_type(tempPointer);
+			}
+
+			template <bool rhsConst> bool operator==(const reverse_iterator_template<rhsConst>& rhs) const
+			{
+				return _iterator == rhs._iterator;
+			}
+
+			template <bool rhsConst> bool operator!=(const reverse_iterator_template<rhsConst>& rhs) const
+			{
+				return !(*this == rhs);
+			}
+
+			template <bool rhsConst> bool operator<(const reverse_iterator_template<rhsConst>& rhs) const
+			{
+				return _iterator > rhs._iterator;
+			}
+
+			template <bool rhsConst> bool operator<=(const reverse_iterator_template<rhsConst>& rhs) const
+			{
+				return _iterator >= rhs._iterator;
+			}
+
+			template <bool rhsConst> bool operator>(const reverse_iterator_template<rhsConst>& rhs) const
+			{
+				return _iterator < rhs._iterator;
+			}
+
+			template <bool rhsConst> bool operator>=(const reverse_iterator_template<rhsConst>& rhs) const
+			{
+				return _iterator <= rhs._iterator;
+			}
+
+		private:
+			iter_type _iterator;
+
+		};
+		using reverse_iterator = reverse_iterator_template<false>;
+		using const_reverse_iterator = reverse_iterator_template<true>;
+
 		~basic_string() 
 		{
 			delete_heap();
@@ -443,6 +603,35 @@ namespace mst
 			return const_iterator(data() + length());
 		}
 
+		reverse_iterator rbegin()
+		{
+			return reverse_iterator(end()._pointer);
+		}
+
+		reverse_iterator rend()
+		{
+			return reverse_iterator(begin()._pointer);
+		}
+
+		const_reverse_iterator rbegin() const
+		{
+			return crbegin();
+		}
+
+		const_reverse_iterator rend() const
+		{
+			return crend();
+		}
+
+		const_reverse_iterator crbegin() const
+		{
+			return const_reverse_iterator(cend()._pointer);
+		}
+
+		const_reverse_iterator crend() const
+		{
+			return const_reverse_iterator(cbegin()._pointer);
+		}
 
 		void clear() noexcept
 		{
