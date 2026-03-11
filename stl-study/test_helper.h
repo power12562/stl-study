@@ -14,7 +14,7 @@ struct VirtualBase
     VirtualBase& operator=(const VirtualBase& rhs) = default;
     VirtualBase(int i) : _i(i) {}
     virtual ~VirtualBase() = default;
-    virtual void foo() = 0;
+    virtual void foo() const = 0;
 
 protected:
     int _i = 0;
@@ -41,7 +41,7 @@ struct VirtualDrived : public VirtualBase
         return *this;
     }
     VirtualDrived(int i) : VirtualBase(i) {}
-    void foo() override
+    void foo() const override
     {
         std::cout << _i;
     }

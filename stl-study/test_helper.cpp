@@ -70,8 +70,19 @@ void mst::vector_test()
             std::cout << ", ";
         }
         std::cout << std::endl;
+
+        for (auto rciter = insertTest.crbegin(); rciter != insertTest.crend(); ++rciter)
+        {
+            rciter->foo();
+            std::cout << ", ";
+        }
+        std::cout << std::endl;
+        std::cout << "size: " << insertTest.size() << std::endl;
+        std::cout << "distance: " << insertTest.crend() - insertTest.crbegin();
+        std::cout << std::endl;
     }
 
+    std::cout << std::endl;
     {
         mst::vector<std::unique_ptr<int>> ptrTest;
         std::unique_ptr<int> p1 = std::make_unique<int>(0);
@@ -85,6 +96,33 @@ void mst::vector_test()
         for (auto& ptr : ptrTest)
         {
             std::cout << *ptr << ", ";
+        }
+        std::cout << std::endl;
+    }
+
+    std::cout << std::endl;
+    {
+        mst::vector<int> sort{3, 1, 2, 5, 4, 7, 6, 9, 10, 8};
+        std::cout << "begin sort: ";
+        for (auto& i : sort)
+        {
+            std::cout << i << ", ";
+        }
+        std::cout << std::endl;
+
+        std::cout << "sort: ";
+        std::sort(sort.begin(), sort.end());
+        for (auto& i : sort)
+        {
+            std::cout << i << ", ";
+        }
+        std::cout << std::endl;
+
+        std::cout << "reverse sort: ";
+        std::sort(sort.rbegin(), sort.rend());
+        for (auto& i : sort)
+        {
+            std::cout << i << ", ";
         }
         std::cout << std::endl;
     }
