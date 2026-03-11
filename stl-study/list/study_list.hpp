@@ -147,7 +147,7 @@ namespace mst
 
 			reverse_iter_type& operator=(const reverse_iter_type& rhs)
 			{
-				_iterator = rhs;
+				_iterator = rhs._iterator;
 				return *this;
 			}
 
@@ -176,7 +176,7 @@ namespace mst
 			{
 				iter_type temp = _iterator;
 				--_iterator;
-				return temp;
+				return reverse_iter_type(temp.get_node());
 			}
 
 			reverse_iter_type& operator--()
@@ -189,7 +189,7 @@ namespace mst
 			{
 				iter_type temp = _iterator;
 				++_iterator;
-				return temp;
+				return reverse_iter_type(temp.get_node());;
 			}
 
 			template <bool rhsConst> bool operator==(const reverse_iterator_template<rhsConst>& rhs) const

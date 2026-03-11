@@ -197,7 +197,22 @@ void mst::list_test()
             std::cout << *i << ", ";
         }
         std::cout << std::endl;
+
+        std::reverse(strTest.rbegin(), strTest.rend());
+        for (auto i = strTest.crbegin(); i != strTest.crend(); ++i)
+        {
+            std::cout << *i << ", ";
+        }
+        std::cout << std::endl;
+
+        std::reverse(strTest.begin(), strTest.end());
+        for (auto i = strTest.crbegin(); i != strTest.crend(); ++i)
+        {
+            std::cout << *i << ", ";
+        }
+        std::cout << std::endl;
     } 
+
 }
 
 void mst::string_test()
