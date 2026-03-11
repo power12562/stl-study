@@ -1,5 +1,6 @@
 ﻿#include "test_helper.h"
 #include <algorithm>
+#include <list>
 
 void mst::vector_test()
 {
@@ -150,6 +151,12 @@ void mst::list_test()
         for (auto& item : strTest)
         {
             std::cout << item << ", ";
+        }
+        std::cout << std::endl;
+
+        for (auto i = strTest.crbegin(); i != strTest.crend(); ++i)
+        {
+            std::cout << *i << ", ";
         }
         std::cout << std::endl;
     } 

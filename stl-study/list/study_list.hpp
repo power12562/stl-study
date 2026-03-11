@@ -52,7 +52,7 @@ namespace mst
 				return get_node()->_data;
 			}
 
-			iter_type& operator=(iter_type rhs)
+			iter_type& operator=(const iter_type& rhs)
 			{
 				_currentNode = rhs._currentNode;
 				return *this;
@@ -118,6 +118,94 @@ namespace mst
 		};
 		using iterator = iterator_template<false>;
 		using const_iterator = iterator_template<true>;
+
+		template <bool CONST_ITER>
+		class reverse_iterator_template
+		{
+			using iter_type = iterator_template<CONST_ITER>;
+			using reverse_iter_type = reverse_iterator_template<CONST_ITER>;
+			using reverse_iterator = reverse_iterator_template<false>;
+			using const_reverse_iterator = reverse_iterator_template<true>;
+			using iter_element_type = std::conditional_t<CONST_ITER, const element_type, element_type>;
+			using iter_node_dummy_type = std::conditional_t<CONST_ITER, const dummy_node, dummy_node>;
+			using iter_node_type = std::conditional_t<CONST_ITER, const node, node>;
+			friend class container_type;
+
+		public:
+			using iterator_category = std::bidirectional_iterator_tag;
+			using value_type = element_type;
+			using difference_type = std::ptrdiff_t;
+			using pointer = iter_element_type*;
+			using reference = iter_element_type&;
+
+			reverse_iterator_template() = default;
+			reverse_iterator_template(iter_node_dummy_type* targetNode) : _iterator(targetNode) {}
+			~reverse_iterator_template() = default;
+
+			template <bool rhsConst>
+			reverse_iterator_template(const reverse_iterator_template<rhsConst>& rhs) requires (CONST_ITER && !rhsConst) : _iterator(rhs._iterator) {}
+
+			reverse_iter_type& operator=(const reverse_iter_type& rhs)
+			{
+				_iterator = rhs;
+				return *this;
+			}
+
+			reference operator*() const noexcept
+			{
+				iter_type temp = _iterator;
+				--temp;
+				return *temp;
+			}
+
+			pointer operator->() const noexcept
+			{
+				iter_type temp = _iterator;
+				--temp;
+				return temp.operator->;
+			}
+
+			reverse_iter_type& operator++()
+			{
+				--_iterator;
+				return *this;
+			}
+
+			reverse_iter_type operator++(int)
+			{
+				iter_type temp = _iterator;
+				--_iterator;
+				return temp;
+			}
+
+			reverse_iter_type& operator--()
+			{
+				++_iterator;
+				return *this;
+			}
+
+			reverse_iter_type operator--(int)
+			{
+				iter_type temp = _iterator;
+				++_iterator;
+				return temp;
+			}
+
+			template <bool rhsConst> bool operator==(const reverse_iterator_template<rhsConst>& rhs) const
+			{
+				return _iterator == rhs._iterator;
+			}
+
+			template <bool rhsConst> bool operator!=(const reverse_iterator_template<rhsConst>& rhs) const
+			{
+				return _iterator != rhs._iterator;
+			}
+
+		private:
+			iter_type _iterator;
+		};
+		using reverse_iterator = reverse_iterator_template<false>;
+		using const_reverse_iterator = reverse_iterator_template<true>;
 
 		friend void swap(container_type& lhs, container_type& rhs)
 		{
@@ -270,6 +358,36 @@ namespace mst
 		const_iterator cend() const
 		{
 			return const_iterator(&_backDummy);
+		}
+
+		reverse_iterator rbegin()
+		{
+			return reverse_iterator(&_backDummy);
+		}
+
+		reverse_iterator rend()
+		{
+			return reverse_iterator(get_front_node());
+		}
+
+		const_reverse_iterator rbegin() const
+		{
+			return const_reverse_iterator(&_backDummy);
+		}
+
+		const_reverse_iterator rend() const
+		{
+			return const_reverse_iterator(get_front_node());
+		}
+
+		const_reverse_iterator crbegin() const
+		{
+			return const_reverse_iterator(&_backDummy);
+		}
+
+		const_reverse_iterator crend() const
+		{
+			return const_reverse_iterator(get_front_node());
 		}
 
 		element_type& front()
