@@ -654,8 +654,8 @@ namespace mst
 		vector(const container_type& rhs)
 		{
 			reserve(rhs.capacity());
-			size_t size = rhs.size();
-			if (0 < size)
+			size_t rhsSize = rhs.size();
+			if (0 < rhsSize)
 			{
 				if constexpr (std::is_trivially_copyable_v<value_type>)
 				{
@@ -663,12 +663,12 @@ namespace mst
 				}
 				else
 				{
-					for (size_t i = 0; i < size; ++i)
+					for (size_t i = 0; i < rhsSize; ++i)
 					{
 						std::construct_at(&_memory[i], rhs[i]);
 					}
 				}
-				_size = rhs.size();
+				_size = rhsSize;
 			}
 		}
 
