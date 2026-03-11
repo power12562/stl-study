@@ -162,7 +162,8 @@ namespace mst
 			{
 				iter_type temp = _iterator;
 				--temp;
-				return temp.operator->;
+				pointer tempPointer = &(*temp);
+				return tempPointer;
 			}
 
 			reverse_iter_type& operator++()
